@@ -5,7 +5,7 @@
 
 // URL do Web App Apps Script
 // const API_URL = "SUA_URL_DO_APPS_SCRIPT";
-const API_URL = "https://script.google.com/macros/s/AKfycbysat29Mb9onzUtJQoXSDLURZY1JlkJBv1scwVsicugw2R7EIAgGB0CadxgxZatnRkf/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwbkB4TVozlCIwvtPosb5nxv09Q-AC7rpZeT3nTf3KaCF7w20LqeysEgutZXDv82Ce3Pg/exec";
 
 
 
