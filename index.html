@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ares Atlântico — Mapa de Mesas</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<h1>Ares Atlântico — Mapa de Mesas</h1>
+<div class="legenda">
+    <span>
+        <i class="dot livre"></i>
+        Livre
+    </span>
+    <span>
+        <i class="dot reservada"></i>
+        Reservada (hold)
+    </span>
+    <span>
+        <i class="dot paga"></i>
+        Vendida
+    </span>
+    <span>
+        <i class="dot selecionada"></i>
+        Selecionada por você
+    </span>
+</div>
+<button id="btnToggleMapa">
+    Ver mapa impresso
+</button>
+<div id="mapaImagemWrapper" class="oculto">
+    <div id="mapaImagemContainer">
+        <img 
+        id="mapaImagem"
+        src="https://res.cloudinary.com/db4i3tch0/image/upload/v1785236888/Projeto%20Mapa%20de%20Mesas/map_edited_uniform_kjpdf8.webp"
+        alt="Mapa das mesas">
+    </div>
+</div>
+<div id="mapa"></div>
+<div id="painel">
+    <div id="resumo-selecao">
+        Nenhuma mesa selecionada.
+    </div>
+    <div id="cronometro"></div>
+    <input 
+    id="nome"
+    type="text"
+    placeholder="Seu nome completo">
+    <input 
+    id="contato"
+    type="text"
+    placeholder="WhatsApp / e-mail">
+    <button 
+    id="btnReservar"
+    disabled>
+        Selecione ao menos 1 mesa
+    </button>
+    <button 
+    id="btnPagar"
+    class="btn-pagar oculto">
+        Pagar com Pix ou Cartão
+    </button>
+    <div id="status-msg"></div>
+</div>
+<!-- Dados e lógica do aplicativo -->
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

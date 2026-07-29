@@ -1,0 +1,224 @@
+// =====================================================
+// API - Comunicação com Google Apps Script
+// =====================================================
+
+
+// URL do Web App Apps Script
+// const API_URL = "SUA_URL_DO_APPS_SCRIPT";
+const API_URL = "https://script.google.com/macros/s/AKfycbysat29Mb9onzUtJQoXSDLURZY1JlkJBv1scwVsicugw2R7EIAgGB0CadxgxZatnRkf/exec";
+
+
+
+
+// =====================================================
+// Função auxiliar GET
+// =====================================================
+
+async function apiGet(params = {}) {
+
+
+    const url = new URL(API_URL);
+
+
+    Object.keys(params).forEach(chave => {
+
+        url.searchParams.append(
+            chave,
+            params[chave]
+        );
+
+    });
+
+
+
+    const resposta = await fetch(url);
+
+
+    if (!resposta.ok) {
+
+        throw new Error(
+            "Erro HTTP: " + resposta.status
+        );
+
+    }
+
+
+    return await resposta.json();
+
+}
+
+
+
+
+
+// =====================================================
+// Função auxiliar POST
+// =====================================================
+
+async function apiPost(dados) {
+
+
+    const resposta = await fetch(
+        API_URL,
+        {
+
+            method:"POST",
+
+            headers:{
+
+                "Content-Type":"application/json"
+
+            },
+
+
+            body:JSON.stringify(dados)
+
+        }
+    );
+
+
+
+    if (!resposta.ok) {
+
+        throw new Error(
+            "Erro HTTP: " + resposta.status
+        );
+
+    }
+
+
+
+    return await resposta.json();
+
+}
+
+
+
+
+
+
+// =====================================================
+// Buscar mesas disponíveis
+// substitui:
+// google.script.run.getMesasParaFrontend()
+// =====================================================
+
+export async function getMesas() {
+
+
+    const resposta = await apiGet({
+
+        acao:"getMesas"
+
+    });
+
+
+    return resposta.mesas || [];
+
+}
+
+
+
+
+
+
+// =====================================================
+// Reservar mesas
+// substitui:
+// reservarMesasApp()
+// =====================================================
+
+export async function reservarMesas(
+    idsMesas,
+    nome,
+    contato
+) {
+
+
+    return await apiPost({
+
+        acao:"reservarMesas",
+
+
+        idsMesas,
+
+
+        nome,
+
+
+        contato
+
+    });
+
+
+}
+
+
+
+
+
+
+// =====================================================
+// Cancelar reserva
+// =====================================================
+
+export async function cancelarReserva(
+    idsMesas,
+    contato
+) {
+
+
+    return await apiPost({
+
+        acao:"cancelarReserva",
+
+
+        idsMesas,
+
+
+        contato
+
+    });
+
+
+}
+
+
+
+
+
+
+// =====================================================
+// Criar pagamento Mercado Pago
+// substitui:
+// criarPreferenciaPagamentoApp()
+// =====================================================
+
+export async function criarPagamento(
+    idsMesas,
+    nome,
+    contato,
+    token
+) {
+
+
+    return await apiPost({
+
+        acao:"criarPagamento",
+
+
+        idsMesas,
+
+
+        nome,
+
+
+        contato,
+
+
+        token
+
+    });
+
+
+}
