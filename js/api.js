@@ -5,6 +5,7 @@
 
 
 // URL do Web App Apps Script
+
 const API_URL =
 "https://script.google.com/macros/s/AKfycbwbkB4TVozlCIwvtPosb5nxv09Q-AC7rpZeT3nTf3KaCF7w20LqeysEgutZXDv82Ce3Pg/exec";
 
@@ -18,8 +19,7 @@ const API_URL =
 async function apiGet(params = {}) {
 
 
-    const url =
-        new URL(API_URL);
+    const url = new URL(API_URL);
 
 
 
@@ -27,16 +27,12 @@ async function apiGet(params = {}) {
 
 
         url.searchParams.append(
-
             chave,
-
             params[chave]
-
         );
 
 
     });
-
 
 
 
@@ -49,11 +45,8 @@ async function apiGet(params = {}) {
 
 
         throw new Error(
-
-            "Erro HTTP GET: "
-            +
+            "Erro HTTP GET: " +
             resposta.status
-
         );
 
 
@@ -61,42 +54,10 @@ async function apiGet(params = {}) {
 
 
 
-
-
-    const texto =
-        await resposta.text();
-
-
-
-
-    try {
-
-
-        return JSON.parse(texto);
-
-
-
-    } catch(e) {
-
-
-        console.error(
-            "Resposta recebida:",
-            texto
-        );
-
-
-        throw new Error(
-            "Resposta inválida da API."
-        );
-
-
-    }
+    return await resposta.json();
 
 
 }
-
-
-
 
 
 
@@ -110,7 +71,6 @@ async function apiGet(params = {}) {
 async function apiPost(dados) {
 
 
-
     const resposta =
         await fetch(
 
@@ -120,19 +80,15 @@ async function apiPost(dados) {
 
                 method:"POST",
 
-
                 headers:{
-
 
                     "Content-Type":
                     "application/json"
 
                 },
 
-
                 body:
                 JSON.stringify(dados)
-
 
             }
 
@@ -141,16 +97,12 @@ async function apiPost(dados) {
 
 
 
-
     if (!resposta.ok) {
 
 
         throw new Error(
-
-            "Erro HTTP POST: "
-            +
+            "Erro HTTP POST: " +
             resposta.status
-
         );
 
 
@@ -158,39 +110,7 @@ async function apiPost(dados) {
 
 
 
-
-
-
-    const texto =
-        await resposta.text();
-
-
-
-
-
-    try {
-
-
-        return JSON.parse(texto);
-
-
-
-    } catch(e) {
-
-
-        console.error(
-            "Resposta recebida:",
-            texto
-        );
-
-
-        throw new Error(
-            "Resposta inválida da API."
-        );
-
-
-    }
-
+    return await resposta.json();
 
 
 }
@@ -202,15 +122,13 @@ async function apiPost(dados) {
 
 
 
-
 // =====================================================
 // Buscar mesas
-// Substitui:
+// substitui:
 // google.script.run.getMesasParaFrontend()
 // =====================================================
 
-async function getMesas(){
-
+export async function getMesas(){
 
 
     const resposta =
@@ -219,7 +137,6 @@ async function getMesas(){
             acao:"getMesas"
 
         });
-
 
 
 
@@ -238,11 +155,10 @@ async function getMesas(){
 
 
 
-
     return resposta.mesas || [];
 
-}
 
+}
 
 
 
@@ -253,11 +169,11 @@ async function getMesas(){
 
 // =====================================================
 // Reservar mesas
-// Substitui:
+// substitui:
 // reservarMesasApp()
 // =====================================================
 
-async function reservarMesas(
+export async function reservarMesas(
 
     idsMesas,
 
@@ -268,27 +184,20 @@ async function reservarMesas(
 ){
 
 
-
     return await apiPost({
 
         acao:"reservarMesas",
 
-
         idsMesas,
-
 
         nome,
 
-
         contato
-
 
     });
 
 
-
 }
-
 
 
 
@@ -301,7 +210,7 @@ async function reservarMesas(
 // Cancelar reserva
 // =====================================================
 
-async function cancelarReserva(
+export async function cancelarReserva(
 
     idsMesas,
 
@@ -310,20 +219,15 @@ async function cancelarReserva(
 ){
 
 
-
     return await apiPost({
 
         acao:"cancelarReserva",
 
-
         idsMesas,
-
 
         contato
 
-
     });
-
 
 
 }
@@ -335,14 +239,13 @@ async function cancelarReserva(
 
 
 
-
 // =====================================================
 // Criar pagamento Mercado Pago
-// Substitui:
+// substitui:
 // criarPreferenciaPagamentoApp()
 // =====================================================
 
-async function criarPagamento(
+export async function criarPagamento(
 
     idsMesas,
 
@@ -355,26 +258,19 @@ async function criarPagamento(
 ){
 
 
-
     return await apiPost({
 
         acao:"criarPagamento",
 
-
         idsMesas,
-
 
         nome,
 
-
         contato,
-
 
         token
 
-
     });
-
 
 
 }
