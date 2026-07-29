@@ -192,10 +192,119 @@ function configurarMapaImagem() {
 
 
 // =====================================================
+// Verificar retorno do pagamento (Mercado Pago)
+// Lê ?pagamento=ok|pendente|erro&mesas=1,2,3 na URL
+// =====================================================
+
+function verificarRetornoPagamento() {
+
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const pagamento =
+        params.get("pagamento");
+
+
+    if (!pagamento) {
+
+        return;
+
+    }
+
+
+
+    const mesasParam =
+        params.get("mesas") || "";
+
+
+    const mesas =
+        mesasParam
+            .split(",")
+            .filter(Boolean);
+
+
+    const listaMesas =
+        mesas.length
+            ? "Mesa" + (mesas.length > 1 ? "s " : " ") + mesas.join(", ")
+            : "Suas mesas";
+
+
+
+    let mensagem = "";
+
+
+    if (pagamento === "ok") {
+
+
+        mensagem =
+            listaMesas +
+            " compradas com sucesso! " +
+            "Em instantes a informação será atualizada no mapa.";
+
+
+    }
+
+    else if (pagamento === "pendente") {
+
+
+        mensagem =
+            listaMesas +
+            ": pagamento pendente de confirmação. " +
+            "Assim que for aprovado, o mapa será atualizado automaticamente.";
+
+
+    }
+
+    else {
+
+
+        mensagem =
+            listaMesas +
+            ": não foi possível confirmar o pagamento. " +
+            "Tente novamente ou entre em contato conosco.";
+
+
+    }
+
+
+
+    alert(mensagem);
+
+
+
+    // Limpa os parâmetros da URL para não repetir
+    // o alerta se a página for recarregada
+    const urlLimpa =
+        window.location.origin
+        +
+        window.location.pathname;
+
+
+    window.history.replaceState(
+        {},
+        "",
+        urlLimpa
+    );
+
+
+}
+
+
+
+
+// =====================================================
 // Inicialização
 // =====================================================
 
 async function iniciarAplicacao() {
+
+
+
+    verificarRetornoPagamento();
 
 
 
