@@ -83,7 +83,7 @@ async function apiPost(dados) {
                 headers:{
 
                     "Content-Type":
-                    "application/json"
+                    "text/plain;charset=utf-8"
 
                 },
 
