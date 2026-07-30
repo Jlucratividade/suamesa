@@ -324,20 +324,18 @@ function iniciarTelegram() {
 
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
+        Telegram.WebApp.disableVerticalSwipes();
 
     }
 
 }
 
-function pegarInitData() {
+if (!window.Telegram || !Telegram.WebApp) {
 
-    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) {
+    document.getElementById("carregando").textContent =
+        "Abra este painel pelo Telegram.";
 
-        return Telegram.WebApp.initData;
-
-    }
-
-    return "";
+    return;
 
 }
 
