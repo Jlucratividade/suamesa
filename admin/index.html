@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Ares Atlântico — Painel</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+
+    :root {
+
+        --livre: #4caf50;
+        --reservada: #f5a623;
+        --paga: #b0b0b0;
+        --pago: #4caf50;
+
+        --bg: #101418;
+        --card: #1b2028;
+        --card-alto: #232a35;
+        --borda: #2a3038;
+
+        --texto: #eef1f4;
+        --texto-fraco: #8a94a3;
+
+        --perigo: #e5484d;
+
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--texto);
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        -webkit-tap-highlight-color: transparent;
+
+    }
+
+    body {
+
+        padding: 14px 14px 32px;
+        padding-top: max(14px, env(safe-area-inset-top));
+
+    }
+
+    /* ===================== Cabeçalho ===================== */
+
+    header {
+
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 14px;
+
+    }
+
+    header h1 {
+
+        font-size: 17px;
+        margin: 0;
+        letter-spacing: .2px;
+
+    }
+
+    header span {
+
+        font-size: 11px;
+        color: var(--texto-fraco);
+
+    }
+
+    /* ===================== Cards de resumo ===================== */
+
+    .resumo {
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+
+    }
+
+    .resumo .card {
+
+        background: var(--card);
+        border: 1px solid var(--borda);
+        border-radius: 10px;
+        padding: 10px 8px;
+        text-align: center;
+
+    }
+
+    .resumo .card b {
+
+        display: block;
+        font-size: 18px;
+        line-height: 1.2;
+
+    }
+
+    .resumo .card small {
+
+        font-size: 10px;
+        color: var(--texto-fraco);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+
+    }
+
+    .resumo .card.faturamento b { color: var(--pago); }
+
+    /* ===================== Busca e filtros ===================== */
+
+    .controles {
+
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+
+    }
+
+    .controles input[type="search"] {
+
+        flex: 1;
+        background: var(--card);
+        border: 1px solid var(--borda);
+        border-radius: 9px;
+        padding: 9px 12px;
+        color: var(--texto);
+        font-size: 13px;
+        outline: none;
+
+    }
+
+    .controles input[type="search"]::placeholder { color: var(--texto-fraco); }
+
+    .filtros {
+
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        margin-bottom: 14px;
+        padding-bottom: 2px;
+
+    }
+
+    .filtros button {
+
+        flex: none;
+        background: var(--card);
+        border: 1px solid var(--borda);
+        color: var(--texto-fraco);
+        font-size: 12px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        white-space: nowrap;
+
+    }
+
+    .filtros button.ativo {
+
+        background: var(--selecionada, #2f6fed);
+        border-color: var(--selecionada, #2f6fed);
+        color: #fff;
+
+    }
+
+    /* ===================== Lista de mesas ===================== */
+
+    .lista { display: flex; flex-direction: column; gap: 8px; }
+
+    .linha {
+
+        background: var(--card);
+        border: 1px solid var(--borda);
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+    }
+
+    .linha .bolinha {
+
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex: none;
+
+    }
+
+    .linha.livre .bolinha { background: var(--livre); }
+    .linha.reservada .bolinha { background: var(--reservada); }
+    .linha.paga .bolinha { background: var(--pago); }
+
+    .linha .info { flex: 1; min-width: 0; }
+
+    .linha .info .l1 {
+
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        font-weight: 600;
+
+    }
+
+    .linha .info .l1 .setor {
+
+        font-weight: 400;
+        color: var(--texto-fraco);
+        font-size: 11px;
+
+    }
+
+    .linha .info .l2 {
+
+        font-size: 12px;
+        color: var(--texto-fraco);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 2px;
+
+    }
+
+    .linha .preco {
+
+        font-size: 13px;
+        font-weight: 600;
+        flex: none;
+        text-align: right;
+
+    }
+
+    .linha .preco small {
+
+        display: block;
+        font-weight: 400;
+        font-size: 10px;
+        color: var(--texto-fraco);
+
+    }
+
+    /* ===================== Estados especiais ===================== */
+
+    #carregando, #vazio, #negado {
+
+        text-align: center;
+        color: var(--texto-fraco);
+        font-size: 13px;
+        padding: 40px 20px;
+
+    }
+
+    #negado {
+
+        color: var(--perigo);
+        display: none;
+
+    }
+
+    #negado b { display: block; color: var(--texto); font-size: 15px; margin-bottom: 6px; }
+
+    .oculto { display: none !important; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Mapa de Mesas — Painel</h1>
+    <span id="hora-atualizacao"></span>
+</header>
+
+<div id="negado">
+    <b>Acesso não autorizado</b>
+    Este painel é restrito à organização do evento.
+</div>
+
+<div id="conteudo" class="oculto">
+
+    <div class="resumo">
+        <div class="card"><b id="qt-livre">–</b><small>Livres</small></div>
+        <div class="card"><b id="qt-reservada">–</b><small>Reservadas</small></div>
+        <div class="card"><b id="qt-paga">–</b><small>Pagas</small></div>
+        <div class="card faturamento"><b id="qt-faturamento">–</b><small>Faturado</small></div>
+    </div>
+
+    <div class="controles">
+        <input type="search" id="busca" placeholder="Buscar por mesa, nome ou contato…">
+    </div>
+
+    <div class="filtros">
+        <button class="ativo" data-filtro="todas">Todas</button>
+        <button data-filtro="RESERVADA">Reservadas</button>
+        <button data-filtro="PAGA">Pagas</button>
+        <button data-filtro="LIVRE">Livres</button>
+    </div>
+
+    <div class="lista" id="lista"></div>
+    <div id="vazio" class="oculto">Nenhuma mesa encontrada com esse filtro.</div>
+
+</div>
+
+<div id="carregando">Carregando reservas…</div>
+
+<script>
+
+// URL do mesmo Web App do Apps Script usado pelo site principal
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbwbkB4TVozlCIwvtPosb5nxv09Q-AC7rpZeT3nTf3KaCF7w20LqeysEgutZXDv82Ce3Pg/exec";
+
+let mesasCache = [];
+let filtroAtual = "todas";
+
+function iniciarTelegram() {
+
+    if (window.Telegram && Telegram.WebApp) {
+
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+
+    }
+
+}
+
+function pegarInitData() {
+
+    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) {
+
+        return Telegram.WebApp.initData;
+
+    }
+
+    return "";
+
+}
+
+async function carregarReservas() {
+
+    const initData = pegarInitData();
+
+    try {
+
+        const resposta = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+                acao: "listarReservasAdmin",
+                initData: initData
+            })
+        });
+
+        const dados = await resposta.json();
+
+        document.getElementById("carregando").classList.add("oculto");
+
+        if (!dados.ok) {
+
+            document.getElementById("negado").style.display = "block";
+            return;
+
+        }
+
+        mesasCache = dados.mesas || [];
+        document.getElementById("conteudo").classList.remove("oculto");
+
+        atualizarHora();
+        renderizar();
+
+    }
+
+    catch (erro) {
+
+        document.getElementById("carregando").textContent =
+            "Erro ao carregar. Puxe para atualizar.";
+
+    }
+
+}
+
+function atualizarHora() {
+
+    const agora = new Date();
+
+    document.getElementById("hora-atualizacao").textContent =
+        "Atualizado às " +
+        agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+}
+
+function formatarMoeda(valor) {
+
+    const numero = Number(valor) || 0;
+
+    return numero.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+
+}
+
+function renderizar() {
+
+    const termo = document.getElementById("busca").value.trim().toLowerCase();
+
+    const livres = mesasCache.filter(m => m.status === "LIVRE").length;
+    const reservadas = mesasCache.filter(m => m.status === "RESERVADA").length;
+    const pagas = mesasCache.filter(m => m.status === "PAGA");
+    const faturado = pagas.reduce((soma, m) => soma + (Number(m.preco) || 0), 0);
+
+    document.getElementById("qt-livre").textContent = livres;
+    document.getElementById("qt-reservada").textContent = reservadas;
+    document.getElementById("qt-paga").textContent = pagas.length;
+    document.getElementById("qt-faturamento").textContent = formatarMoeda(faturado);
+
+    let filtradas = mesasCache;
+
+    if (filtroAtual !== "todas") {
+
+        filtradas = filtradas.filter(m => m.status === filtroAtual);
+
+    }
+
+    if (termo) {
+
+        filtradas = filtradas.filter(m => {
+
+            const alvo = (
+                String(m.id) + " " +
+                String(m.reservadoPor || "") + " " +
+                String(m.contato || "")
+            ).toLowerCase();
+
+            return alvo.includes(termo);
+
+        });
+
+    }
+
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
+
+    document.getElementById("vazio").classList.toggle("oculto", filtradas.length > 0);
+
+    filtradas.forEach(mesa => {
+
+        const linha = document.createElement("div");
+        linha.className = "linha " + mesa.status.toLowerCase();
+
+        const quemReservou =
+            mesa.status === "LIVRE"
+                ? "Disponível"
+                : (mesa.reservadoPor || "—") + (mesa.contato ? " · " + mesa.contato : "");
+
+        linha.innerHTML = `
+            <div class="bolinha"></div>
+            <div class="info">
+                <div class="l1">Mesa ${mesa.id} <span class="setor">${mesa.setor || ""}</span></div>
+                <div class="l2">${quemReservou}</div>
+            </div>
+            <div class="preco">
+                ${formatarMoeda(mesa.preco)}
+                <small>${mesa.status}</small>
+            </div>
+        `;
+
+        lista.appendChild(linha);
+
+    });
+
+}
+
+document.getElementById("busca").addEventListener("input", renderizar);
+
+document.querySelectorAll(".filtros button").forEach(botao => {
+
+    botao.addEventListener("click", () => {
+
+        document.querySelectorAll(".filtros button").forEach(b => b.classList.remove("ativo"));
+        botao.classList.add("ativo");
+        filtroAtual = botao.dataset.filtro;
+        renderizar();
+
+    });
+
+});
+
+iniciarTelegram();
+carregarReservas();
+
+</script>
+
+</body>
+</html>
