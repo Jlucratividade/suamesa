@@ -330,16 +330,28 @@ function iniciarTelegram() {
 
 }
 
-if (!window.Telegram || !Telegram.WebApp) {
+function pegarInitData() {
 
-    document.getElementById("carregando").textContent =
-        "Abra este painel pelo Telegram.";
+    if (window.Telegram && Telegram.WebApp) {
 
-    return;
+        return Telegram.WebApp.initData || "";
+
+    }
+
+    return "";
 
 }
 
 async function carregarReservas() {
+
+    if (!window.Telegram || !Telegram.WebApp) {
+
+        document.getElementById("carregando").textContent =
+            "Abra este painel pelo Telegram.";
+
+        return;
+
+    }
 
     const initData = pegarInitData();
 
