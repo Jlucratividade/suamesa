@@ -280,6 +280,7 @@
 <div id="negado">
     <b>Acesso não autorizado</b>
     Este painel é restrito à organização do evento.
+    <div id="negado-debug" style="margin-top:10px;font-size:11px;color:var(--texto-fraco);word-break:break-all;"></div>
 </div>
 
 <div id="conteudo" class="oculto">
@@ -373,6 +374,12 @@ async function carregarReservas() {
         if (!dados.ok) {
 
             document.getElementById("negado").style.display = "block";
+
+            // DEBUG TEMPORÁRIO — remover depois de identificar o problema
+            document.getElementById("negado-debug").textContent =
+                "erro: " + (dados.erro || "(sem mensagem)") +
+                " | initData: " + (initData ? initData : "(vazio)");
+
             return;
 
         }
