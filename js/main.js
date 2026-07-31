@@ -256,8 +256,8 @@ async function iniciarAplicacao() {
     
     // Inicializa módulos
     iniciarReserva(carregarMesas);
-    iniciarReserva();
     iniciarPagamento();
+    iniciarValidacao();
 }
 
 iniciarAplicacao();
