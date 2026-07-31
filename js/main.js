@@ -6,6 +6,7 @@ import { getMesas } from "./api.js";
 import { atualizarMesas, definirCoordenadas } from "./mapa.js";
 import { iniciarReserva } from "./reserva.js";
 import { iniciarPagamento } from "./pagamento.js";
+import { iniciarValidacao } from "./validacao.js";
 
 // =====================================================
 // CONFIGURAÇÕES
@@ -254,6 +255,7 @@ async function iniciarAplicacao() {
     configurarBotaoAtualizar();
     
     // Inicializa módulos
+    iniciarValidacao();
     iniciarReserva();
     iniciarPagamento();
 }
