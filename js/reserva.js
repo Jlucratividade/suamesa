@@ -3,400 +3,152 @@
 // Controle do fluxo de reserva das mesas
 // =====================================================
 
-
-import { reservarMesas } from "./api.js";
-
-import {
-    selecionadas,
-    atualizarResumo
-} from "./mapa.js";
-
-// iniciarCronometro não é mais chamado (ver comentário mais abaixo,
-// na função que trata a resposta de reservarMesas) — a expiração da
-// reserva agora é controlada pelo admin via gatilho, não por um
-// cronômetro individual no navegador do cliente.
-import {
-    pararCronometro
-} from "./timer.js";
-
-
-
-
+import { reservarMesas, cancelarReserva } from "./api.js";
+import { selecionadas, atualizarResumo, mesasState } from "./mapa.js";
 
 export let reservaAtual = null;
-
-
-
-
-
+let refreshMapaCallback = null;
 
 // =====================================================
 // Inicializa botão reservar
 // =====================================================
+export function iniciarReserva(callbackRefresh) {
+    refreshMapaCallback = callbackRefresh;
 
-export function iniciarReserva() {
-
-
-    const btn =
-        document.getElementById(
-            "btnReservar"
-        );
-
-
-
-    btn.addEventListener(
-        "click",
-        executarReserva
-    );
-
-
+    const btn = document.getElementById("btnReservar");
+    btn.addEventListener("click", executarReserva);
 }
 
-
-
-
-
-
-
+// =====================================================
+// Função auxiliar para atualizar o mapa sob demanda
+// =====================================================
+async function refreshMapa() {
+    if (refreshMapaCallback) {
+        await refreshMapaCallback();
+    }
+}
 
 // =====================================================
 // Executa reserva
 // =====================================================
-
 async function executarReserva() {
-
-
-
-    const nome =
-        document.getElementById(
-            "nome"
-        )
-        .value
-        .trim();
-
-
-
-
-    const contato =
-        document.getElementById(
-            "contato"
-        )
-        .value
-        .trim();
-
-
-
-
-    const status =
-        document.getElementById(
-            "status-msg"
-        );
-
-
-
-
-
+    const nome = document.getElementById("nome").value.trim();
+    const contato = document.getElementById("contato").value.trim();
+    const status = document.getElementById("status-msg");
 
     if (!nome || !contato) {
-
-
-        status.textContent =
-            "Preencha nome e contato antes de reservar.";
-
-
+        status.textContent = "Preencha nome e contato antes de reservar.";
         return;
-
-
     }
 
-
-
-
-
-
-
-    const btn =
-        document.getElementById(
-            "btnReservar"
-        );
-
-
-
+    const btn = document.getElementById("btnReservar");
     btn.disabled = true;
-
-
-    btn.textContent =
-        "Reservando...";
-
-
-
-    status.textContent =
-        "";
-
-
-
-
-
-
-    try {
-
-
-
-        const resposta =
-            await reservarMesas(
-
-                Array.from(
-                    selecionadas
-                ),
-
-                nome,
-
-                contato
-
-            );
-
-
-
-
-
-
-
-        if (
-            resposta.ok
-        ) {
-
-
-
-            status.textContent =
-                resposta.mensagem;
-
-
-
-
-
-            reservaAtual = {
-
-
-                token:
-                    resposta.token,
-
-
-                nome,
-
-
-                contato,
-
-
-
-                mesas:
-                    Array.from(
-                        selecionadas
-                    )
-
-
-            };
-
-
-
-
-
-
-
-            // MUDANÇA DE REGRA DE NEGÓCIO: a reserva não expira mais
-            // individualmente por um cronômetro por usuário. Quem
-            // controla quando as reservas "vencem" agora é o
-            // administrador, via um gatilho agendado no painel
-            // ("Agendar liberação das mesas reservadas" — veja
-            // GAS/AdminAcoes.gs, criarGatilhoLiberarReservadas).
-            // Por isso NÃO iniciamos mais o cronômetro aqui.
-            // (função ainda existe em timer.js, só não é mais chamada)
-            //
-            // iniciarCronometro(
-            //     resposta.expiraEm
-            // );
-
-
-
-
-
-
-            btn.style.display =
-                "none";
-
-
-
-
-
-
-            document.getElementById(
-                "nome"
-            )
-            .disabled = true;
-
-
-
-
-
-            document.getElementById(
-                "contato"
-            )
-            .disabled = true;
-
-
-
-
-
-
-            const btnPagar =
-                document.getElementById(
-                    "btnPagar"
-                );
-
-
-
-
-
-            btnPagar.classList.remove(
-                "oculto"
-            );
-
-
-
-            btnPagar.disabled =
-                false;
-
-
-
-            btnPagar.textContent =
-                "Pagar com Pix ou Cartão";
-
-
-
-
-
-        }
-
-        else {
-
-
-
-            status.textContent =
-                "Erro: " + resposta.erro;
-
-
-
-
-            btn.disabled =
-                false;
-
-
-
-
-            btn.textContent =
-                "Reservar e ir para pagamento";
-
-
-
-        }
-
-
-
-
-
-    }
-
-    catch(erro){
-
-
-
-        status.textContent =
-            "Erro de comunicação: "
-            + erro.message;
-
-
-
-        btn.disabled =
-            false;
-
-
-
-        btn.textContent =
-            "Reservar e ir para pagamento";
-
-
-    }
-
-
-
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =====================================================
-// Limpar reserva quando expirar
-// =====================================================
-
-export function limparReserva() {
-
-
-    reservaAtual = null;
-
-
-
-    pararCronometro();
-
-
-
-    document.getElementById(
-        "btnPagar"
-    )
-    .classList.add(
-        "oculto"
+    btn.textContent = "Verificando disponibilidade...";
+    status.textContent = "";
+
+    // 3. Imediatamente antes de o usuário tentar reservar
+    await refreshMapa();
+
+    // Verifica se as mesas selecionadas ainda estão livres após o refresh
+    const mesasSelecionadasArray = Array.from(selecionadas);
+    const mesasIndisponiveis = mesasState.filter(m => 
+        mesasSelecionadasArray.includes(String(m.id)) && m.status !== "LIVRE"
     );
 
+    if (mesasIndisponiveis.length > 0) {
+        const ids = mesasIndisponiveis.map(m => m.id).join(", ");
+        status.textContent = `Conflito: A(s) mesa(s) ${ids} já não está(ão) disponível(eis). Selecione outras.`;
+        btn.disabled = false;
+        btn.textContent = "Reservar e ir para pagamento";
+        return;
+    }
 
+    btn.textContent = "Reservando...";
 
+    try {
+        const resposta = await reservarMesas(
+            mesasSelecionadasArray,
+            nome,
+            contato
+        );
 
-    document.getElementById(
-        "btnReservar"
-    )
-    .style.display =
-        "block";
+        if (resposta.ok) {
+            status.textContent = resposta.mensagem;
 
+            reservaAtual = {
+                token: resposta.token,
+                nome,
+                contato,
+                mesas: mesasSelecionadasArray
+            };
 
+            // 4. Depois que uma ação de escrita é concluída (reservar)
+            await refreshMapa();
 
+            btn.style.display = "none";
+            document.getElementById("nome").disabled = true;
+            document.getElementById("contato").disabled = true;
 
+            const btnPagar = document.getElementById("btnPagar");
+            btnPagar.classList.remove("oculto");
+            btnPagar.disabled = false;
+            btnPagar.textContent = "Pagar com Pix ou Cartão";
+        } else {
+            // 6. Quando uma tentativa de escrita falha por conflito
+            status.textContent = "Erro: " + resposta.erro;
+            await refreshMapa(); // Atualiza para mostrar o estado real
+            
+            btn.disabled = false;
+            btn.textContent = "Reservar e ir para pagamento";
+        }
+    } catch(erro) {
+        status.textContent = "Erro de comunicação: " + erro.message;
+        // 6. Também atualiza em caso de erro de rede/conflito
+        await refreshMapa();
+        
+        btn.disabled = false;
+        btn.textContent = "Reservar e ir para pagamento";
+    }
+}
 
-    document.getElementById(
-        "nome"
-    )
-    .disabled = false;
+// =====================================================
+// Cancelar reserva (se aplicável no seu fluxo)
+// =====================================================
+export async function cancelarReservaUsuario() {
+    if (!reservaAtual) return;
+    
+    const status = document.getElementById("status-msg");
+    status.textContent = "Cancelando reserva...";
+    
+    try {
+        const resposta = await cancelarReserva(
+            reservaAtual.mesas,
+            reservaAtual.contato
+        );
+        
+        if (resposta.ok) {
+            status.textContent = "Reserva cancelada com sucesso.";
+            limparReserva();
+            // 4. Depois que uma ação de escrita é concluída (cancelar)
+            await refreshMapa();
+        } else {
+            status.textContent = "Erro ao cancelar: " + resposta.erro;
+            await refreshMapa();
+        }
+    } catch(erro) {
+        status.textContent = "Erro de comunicação ao cancelar: " + erro.message;
+        await refreshMapa();
+    }
+}
 
-
-
-
-    document.getElementById(
-        "contato"
-    )
-    .disabled = false;
-
-
-
-
-
+// =====================================================
+// Limpar reserva
+// =====================================================
+export function limparReserva() {
+    reservaAtual = null;
+    document.getElementById("btnPagar").classList.add("oculto");
+    document.getElementById("btnReservar").style.display = "block";
+    document.getElementById("nome").disabled = false;
+    document.getElementById("contato").disabled = false;
     atualizarResumo();
-
-
-
 }
