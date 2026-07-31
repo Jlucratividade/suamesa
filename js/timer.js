@@ -1,5 +1,17 @@
 // =====================================================
 // TIMER - Controle do tempo de reserva
+//
+// ATENÇÃO — MÓDULO ATUALMENTE DESATIVADO (não é mais
+// chamado por reserva.js): a regra de negócio mudou e a
+// reserva de uma mesa não expira mais individualmente por
+// um cronômetro no navegador de cada cliente. Quem decide
+// quando "desreservar" as mesas agora é o administrador,
+// através de um gatilho agendado no painel /admin (ver
+// GAS/AdminAcoes.gs -> criarGatilhoLiberarReservadas).
+//
+// O código abaixo foi mantido no projeto (não apagado) caso
+// no futuro se queira reativar um cronômetro por usuário —
+// mas hoje ele não é importado/usado em nenhum lugar ativo.
 // =====================================================
 
 

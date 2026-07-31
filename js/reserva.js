@@ -11,8 +11,11 @@ import {
     atualizarResumo
 } from "./mapa.js";
 
+// iniciarCronometro não é mais chamado (ver comentário mais abaixo,
+// na função que trata a resposta de reservarMesas) — a expiração da
+// reserva agora é controlada pelo admin via gatilho, não por um
+// cronômetro individual no navegador do cliente.
 import {
-    iniciarCronometro,
     pararCronometro
 } from "./timer.js";
 
@@ -199,9 +202,18 @@ async function executarReserva() {
 
 
 
-            iniciarCronometro(
-                resposta.expiraEm
-            );
+            // MUDANÇA DE REGRA DE NEGÓCIO: a reserva não expira mais
+            // individualmente por um cronômetro por usuário. Quem
+            // controla quando as reservas "vencem" agora é o
+            // administrador, via um gatilho agendado no painel
+            // ("Agendar liberação das mesas reservadas" — veja
+            // GAS/AdminAcoes.gs, criarGatilhoLiberarReservadas).
+            // Por isso NÃO iniciamos mais o cronômetro aqui.
+            // (função ainda existe em timer.js, só não é mais chamada)
+            //
+            // iniciarCronometro(
+            //     resposta.expiraEm
+            // );
 
 
 

@@ -172,6 +172,43 @@
 
     .lista { display: flex; flex-direction: column; gap: 8px; }
 
+    .linha-wrap {
+
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+
+    }
+
+    .linha-acoes {
+
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 168px;
+        display: flex;
+
+    }
+
+    .linha-acao {
+
+        height: 100%;
+        width: 84px;
+        color: #fff;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+
+    }
+
+    .linha-acao.editar { background: var(--selecionada, #2f6fed); }
+    .linha-acao.liberar { background: var(--perigo); }
+
     .linha {
 
         background: var(--card);
@@ -181,8 +218,14 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        position: relative;
+        z-index: 1;
+        transition: transform .18s ease;
+        touch-action: pan-y;
 
     }
+
+    .linha.aberta { /* transform aplicado via JS, largura varia por linha */ }
 
     .linha .bolinha {
 
@@ -195,7 +238,7 @@
 
     .linha.livre .bolinha { background: var(--livre); }
     .linha.reservada .bolinha { background: var(--reservada); }
-    .linha.paga .bolinha { background: var(--pago); }
+    .linha.paga .bolinha { background: var(--paga); }
 
     .linha .info { flex: 1; min-width: 0; }
 
@@ -266,7 +309,210 @@
 
     #negado b { display: block; color: var(--texto); font-size: 15px; margin-bottom: 6px; }
 
+    #aviso-debug {
+
+        background: #5b3a00;
+        color: #ffd479;
+        font-size: 11px;
+        text-align: center;
+        padding: 4px;
+
+    }
+
     .oculto { display: none !important; }
+
+    /* ===================== Ação: liberar todas ===================== */
+
+    .ferramentas-admin {
+
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 14px;
+        margin-bottom: 8px;
+
+    }
+
+    .link-perigo, .link-neutro {
+
+        background: none;
+        border: none;
+        font-size: 12px;
+        padding: 4px 2px;
+        text-decoration: underline;
+
+    }
+
+    .link-perigo { color: var(--perigo); }
+    .link-neutro { color: var(--selecionada, #2f6fed); }
+
+    .caixa-gatilho {
+
+        background: var(--card);
+        border: 1px solid var(--borda);
+        border-radius: 9px;
+        padding: 8px 10px;
+        font-size: 12px;
+        color: var(--texto-fraco);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+
+    }
+
+    .caixa-gatilho button {
+
+        background: none;
+        border: 1px solid var(--borda);
+        border-radius: 7px;
+        color: var(--texto);
+        font-size: 11px;
+        padding: 5px 8px;
+        white-space: nowrap;
+
+    }
+
+    .dica-swipe {
+
+        text-align: center;
+        color: var(--texto-fraco);
+        font-size: 11px;
+        margin: -4px 0 10px;
+
+    }
+
+    .modal-overlay {
+
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 100;
+
+    }
+
+    .modal-caixa {
+
+        background: var(--card-alto);
+        border: 1px solid var(--borda);
+        border-radius: 14px;
+        padding: 18px;
+        width: 100%;
+        max-width: 340px;
+
+    }
+
+    .modal-caixa b {
+
+        display: block;
+        font-size: 15px;
+        margin-bottom: 8px;
+
+    }
+
+    .modal-caixa p {
+
+        font-size: 13px;
+        color: var(--texto-fraco);
+        line-height: 1.4;
+        margin: 0 0 10px;
+
+    }
+
+    .modal-caixa code {
+
+        background: var(--card);
+        border: 1px solid var(--borda);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--texto);
+
+    }
+
+    .modal-caixa label {
+
+        display: block;
+        font-size: 12px;
+        color: var(--texto-fraco);
+        margin-bottom: 4px;
+
+    }
+
+    .modal-caixa input,
+    .modal-caixa select,
+    .modal-caixa textarea {
+
+        width: 100%;
+        background: var(--card);
+        border: 1px solid var(--borda);
+        border-radius: 9px;
+        padding: 9px 12px;
+        color: var(--texto);
+        font-size: 14px;
+        outline: none;
+        margin-bottom: 12px;
+        font-family: inherit;
+
+    }
+
+    .modal-caixa textarea { resize: vertical; min-height: 50px; }
+
+    .modal-caixa .linha-check {
+
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 13px;
+
+    }
+
+    .modal-caixa .linha-check input { width: auto; margin: 0; }
+
+    .input-maiusculas { text-transform: uppercase; }
+
+    .modal-botoes {
+
+        display: flex;
+        gap: 8px;
+
+    }
+
+    .modal-botoes button {
+
+        flex: 1;
+        border: none;
+        border-radius: 9px;
+        padding: 10px;
+        font-size: 13px;
+        font-weight: 600;
+
+    }
+
+    #btn-cancelar-liberar-todas {
+
+        background: var(--card);
+        border: 1px solid var(--borda);
+        color: var(--texto);
+
+    }
+
+    #btn-confirmar-liberar-todas {
+
+        background: var(--perigo);
+        color: #fff;
+
+    }
+
+    #btn-confirmar-liberar-todas:disabled {
+
+        opacity: .4;
+
+    }
 
 </style>
 </head>
@@ -277,10 +523,12 @@
     <span id="hora-atualizacao"></span>
 </header>
 
+<div id="aviso-debug" class="oculto">🐞 Modo debug ativo (?debug=1)</div>
+
 <div id="negado">
     <b>Acesso não autorizado</b>
     Este painel é restrito à organização do evento.
-    <div id="negado-debug" style="margin-top:10px;font-size:11px;color:var(--texto-fraco);word-break:break-all;"></div>
+    <div id="negado-debug" class="oculto" style="margin-top:10px;font-size:11px;color:var(--texto-fraco);word-break:break-all;"></div>
 </div>
 
 <div id="conteudo" class="oculto">
@@ -303,12 +551,99 @@
         <button data-filtro="LIVRE">Livres</button>
     </div>
 
+    <div class="ferramentas-admin">
+        <button class="link-perigo" id="btn-abrir-liberar-todas">Liberar todas as mesas</button>
+        <button class="link-perigo" id="btn-liberar-reservadas">Liberar reservadas agora</button>
+        <button class="link-neutro" id="btn-abrir-preco-setor">Editar preço por setor</button>
+    </div>
+
+    <div class="caixa-gatilho" id="caixa-gatilho">Carregando agendamento…</div>
+
+    <div class="dica-swipe">Arraste uma mesa reservada/paga para a esquerda para editar ou liberar</div>
+
     <div class="lista" id="lista"></div>
     <div id="vazio" class="oculto">Nenhuma mesa encontrada com esse filtro.</div>
 
 </div>
 
 <div id="carregando">Carregando reservas…</div>
+
+<div id="modal-liberar-todas" class="modal-overlay oculto">
+    <div class="modal-caixa">
+        <b>Liberar TODAS as mesas?</b>
+        <p>Isso vai apagar todas as reservas e pagamentos registrados no evento. Essa ação não pode ser desfeita.</p>
+        <p>Digite <code>LIBERAR</code> para confirmar:</p>
+        <input type="text" id="input-confirma-liberar-todas" class="input-maiusculas" autocomplete="off" autocapitalize="characters">
+        <div class="modal-botoes">
+            <button id="btn-cancelar-liberar-todas">Cancelar</button>
+            <button id="btn-confirmar-liberar-todas" disabled>Liberar todas</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-editar-mesa" class="modal-overlay oculto">
+    <div class="modal-caixa">
+        <b id="titulo-editar-mesa">Editar mesa</b>
+
+        <label for="input-editar-nome">Nome</label>
+        <input type="text" id="input-editar-nome" autocomplete="off">
+
+        <label for="input-editar-contato">Contato</label>
+        <input type="text" id="input-editar-contato" autocomplete="off">
+
+        <label for="input-editar-preco">Preço (R$)</label>
+        <input type="number" step="0.01" min="0" id="input-editar-preco">
+
+        <label for="input-editar-observacao">Observação interna (não visível ao cliente)</label>
+        <textarea id="input-editar-observacao" rows="2"></textarea>
+
+        <label for="input-editar-hold">Estender tempo de reserva (minutos a partir de agora)</label>
+        <input type="number" min="0" id="input-editar-hold" placeholder="Deixe em branco para não alterar">
+
+        <div class="linha-check">
+            <input type="checkbox" id="input-editar-marcar-paga">
+            <label for="input-editar-marcar-paga" style="margin:0;">Marcar como paga manualmente</label>
+        </div>
+
+        <div class="modal-botoes">
+            <button id="btn-cancelar-editar-mesa">Cancelar</button>
+            <button id="btn-confirmar-editar-mesa">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-preco-setor" class="modal-overlay oculto">
+    <div class="modal-caixa">
+        <b>Editar preço por setor</b>
+        <p>Isso altera o preço de todas as mesas do setor escolhido.</p>
+
+        <label for="select-preco-setor">Setor</label>
+        <select id="select-preco-setor"></select>
+
+        <label for="input-preco-setor">Novo preço (R$)</label>
+        <input type="number" step="0.01" min="0" id="input-preco-setor">
+
+        <div class="modal-botoes">
+            <button id="btn-cancelar-preco-setor">Cancelar</button>
+            <button id="btn-confirmar-preco-setor">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-gatilho" class="modal-overlay oculto">
+    <div class="modal-caixa">
+        <b>Agendar liberação das mesas reservadas</b>
+        <p>No horário escolhido, todas as mesas com status <b>RESERVADA</b> (não pagas) serão liberadas automaticamente. Só pode haver um agendamento ativo por vez.</p>
+
+        <label for="input-gatilho-data">Data e hora</label>
+        <input type="datetime-local" id="input-gatilho-data">
+
+        <div class="modal-botoes">
+            <button id="btn-cancelar-gatilho">Cancelar</button>
+            <button id="btn-confirmar-gatilho">Agendar</button>
+        </div>
+    </div>
+</div>
 
 <script>
 
@@ -318,6 +653,35 @@ const API_URL =
 
 let mesasCache = [];
 let filtroAtual = "todas";
+
+// =====================================================
+// MODO DEBUG (opt-in via URL: .../admin/?debug=1)
+//
+// Em vez de deixar informação de diagnóstico (erro bruto
+// do backend, initData recebido, etc.) sempre visível na
+// tela — ou pior, ter que colar/apagar um bloco de debug
+// manualmente toda vez que algo dá errado — esse modo só
+// aparece quando o próprio administrador abre o painel com
+// "?debug=1" no final da URL do Web App. Isso é seguro
+// porque:
+//   1) não muda nada na validação feita no backend (o
+//      exigirAdminTelegram continua sendo a única fonte de
+//      verdade sobre quem é admin);
+//   2) um usuário comum, sem saber desse parâmetro, nunca
+//      vê nenhum dado extra;
+//   3) fica registrado no próprio código, então não corre o
+//      risco de "esquecer" um console.log ou div de debug
+//      solto em produção.
+// =====================================================
+const modoDebug =
+    new URLSearchParams(window.location.search).get("debug") === "1";
+
+if (modoDebug) {
+
+    document.getElementById("aviso-debug").classList.remove("oculto");
+    console.log("[modoDebug] ativo — initData:", (window.Telegram && Telegram.WebApp) ? Telegram.WebApp.initData : "(Telegram.WebApp indisponível)");
+
+}
 
 function iniciarTelegram() {
 
@@ -369,16 +733,25 @@ async function carregarReservas() {
 
         const dados = await resposta.json();
 
+        if (modoDebug) {
+            console.log("[modoDebug] resposta de listarReservasAdmin:", dados);
+        }
+
         document.getElementById("carregando").classList.add("oculto");
 
         if (!dados.ok) {
 
             document.getElementById("negado").style.display = "block";
 
-            // DEBUG TEMPORÁRIO — remover depois de identificar o problema
-            document.getElementById("negado-debug").textContent =
-                "erro: " + (dados.erro || "(sem mensagem)") +
-                " | initData: " + (initData ? initData : "(vazio)");
+            if (modoDebug) {
+
+                document.getElementById("negado-debug").textContent =
+                    "[debug] erro: " + (dados.erro || "(sem mensagem)") +
+                    " | initData: " + (initData ? initData : "(vazio)");
+
+                document.getElementById("negado-debug").classList.remove("oculto");
+
+            }
 
             return;
 
@@ -467,6 +840,9 @@ function renderizar() {
 
     filtradas.forEach(mesa => {
 
+        const wrap = document.createElement("div");
+        wrap.className = "linha-wrap";
+
         const linha = document.createElement("div");
         linha.className = "linha " + mesa.status.toLowerCase();
 
@@ -487,9 +863,244 @@ function renderizar() {
             </div>
         `;
 
-        lista.appendChild(linha);
+        wrap.appendChild(linha);
+
+        const acoes = document.createElement("div");
+        acoes.className = "linha-acoes";
+
+        const acaoEditar = document.createElement("button");
+        acaoEditar.className = "linha-acao editar";
+        acaoEditar.textContent = "Editar";
+        acaoEditar.addEventListener("click", () => abrirModalEditarMesa(mesa.id));
+        acoes.appendChild(acaoEditar);
+
+        let largura = 84;
+
+        if (mesa.status !== "LIVRE") {
+
+            const acaoLiberar = document.createElement("button");
+            acaoLiberar.className = "linha-acao liberar";
+            acaoLiberar.textContent = "Liberar";
+            acaoLiberar.addEventListener("click", () => liberarMesa(mesa.id, linha));
+            acoes.appendChild(acaoLiberar);
+
+            largura = 168;
+
+        }
+
+        acoes.style.width = largura + "px";
+        wrap.appendChild(acoes);
+        anexarSwipe(linha, largura);
+
+        lista.appendChild(wrap);
 
     });
+
+}
+
+// ===================== Swipe para liberar mesa =====================
+
+let linhaAberta = null;
+
+function fecharLinhaAberta() {
+
+    if (linhaAberta) {
+
+        linhaAberta.classList.remove("aberta");
+        linhaAberta.style.transform = "";
+        linhaAberta = null;
+
+    }
+
+}
+
+function anexarSwipe(linhaEl, largura) {
+
+    let startX = 0;
+    let startY = 0;
+    let deltaX = 0;
+    let arrastando = false;
+    let jaAberta = false;
+
+    linhaEl.addEventListener("touchstart", e => {
+
+        if (linhaAberta && linhaAberta !== linhaEl) {
+            fecharLinhaAberta();
+        }
+
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        deltaX = 0;
+        arrastando = false;
+        jaAberta = linhaEl.classList.contains("aberta");
+        linhaEl.style.transition = "none";
+
+    }, { passive: true });
+
+    linhaEl.addEventListener("touchmove", e => {
+
+        const dx = e.touches[0].clientX - startX;
+        const dy = e.touches[0].clientY - startY;
+
+        if (!arrastando) {
+
+            if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+
+            arrastando = Math.abs(dx) > Math.abs(dy);
+
+            if (!arrastando) return;
+
+        }
+
+        e.preventDefault();
+
+        const base = jaAberta ? -largura : 0;
+        deltaX = Math.min(0, Math.max(-largura, base + dx));
+        linhaEl.style.transform = `translateX(${deltaX}px)`;
+
+    }, { passive: false });
+
+    linhaEl.addEventListener("touchend", () => {
+
+        linhaEl.style.transition = "";
+
+        if (!arrastando) {
+
+            linhaEl.style.transform = jaAberta ? `translateX(${-largura}px)` : "";
+
+            if (jaAberta) fecharLinhaAberta();
+
+            return;
+
+        }
+
+        if (deltaX <= -largura / 2) {
+
+            linhaEl.style.transform = `translateX(${-largura}px)`;
+            linhaEl.classList.add("aberta");
+            linhaAberta = linhaEl;
+
+        } else {
+
+            linhaEl.style.transform = "";
+            linhaEl.classList.remove("aberta");
+            if (linhaAberta === linhaEl) linhaAberta = null;
+
+        }
+
+    });
+
+}
+
+document.addEventListener("click", e => {
+
+    if (linhaAberta && !linhaAberta.parentElement.contains(e.target)) {
+        fecharLinhaAberta();
+    }
+
+});
+
+// ===================== Ações administrativas =====================
+
+async function chamarApi(acao, extra) {
+
+    const resposta = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(Object.assign({
+            acao: acao,
+            initData: pegarInitData()
+        }, extra))
+    });
+
+    return resposta.json();
+
+}
+
+async function liberarMesa(idMesa, linhaEl) {
+
+    const confirmar = texto => new Promise(resolve => {
+
+        if (window.Telegram && Telegram.WebApp && Telegram.WebApp.showConfirm) {
+            Telegram.WebApp.showConfirm(texto, resolve);
+        } else {
+            resolve(window.confirm(texto));
+        }
+
+    });
+
+    const confirmado = await confirmar(`Liberar a Mesa ${idMesa}? Isso apaga a reserva/pagamento dela.`);
+
+    if (!confirmado) {
+        fecharLinhaAberta();
+        return;
+    }
+
+    if (linhaEl) linhaEl.style.opacity = "0.5";
+
+    try {
+
+        const dados = await chamarApi("liberarMesaAdmin", { idMesa: idMesa });
+
+        if (!dados.ok) {
+            alert(dados.erro || "Não foi possível liberar a mesa.");
+            if (linhaEl) linhaEl.style.opacity = "";
+            return;
+        }
+
+        fecharLinhaAberta();
+        await carregarReservas();
+
+    } catch (erro) {
+
+        alert("Erro de conexão ao liberar a mesa.");
+        if (linhaEl) linhaEl.style.opacity = "";
+
+    }
+
+}
+
+function abrirModalLiberarTodas() {
+
+    document.getElementById("input-confirma-liberar-todas").value = "";
+    document.getElementById("btn-confirmar-liberar-todas").disabled = true;
+    document.getElementById("modal-liberar-todas").classList.remove("oculto");
+
+}
+
+function fecharModalLiberarTodas() {
+
+    document.getElementById("modal-liberar-todas").classList.add("oculto");
+
+}
+
+async function liberarTodas() {
+
+    const botao = document.getElementById("btn-confirmar-liberar-todas");
+    botao.disabled = true;
+    botao.textContent = "Liberando…";
+
+    try {
+
+        const dados = await chamarApi("liberarTodasAdmin", { confirmacao: "LIBERAR" });
+
+        if (!dados.ok) {
+            alert(dados.erro || "Não foi possível liberar as mesas.");
+            botao.disabled = false;
+            botao.textContent = "Liberar todas";
+            return;
+        }
+
+        fecharModalLiberarTodas();
+        await carregarReservas();
+
+    } catch (erro) {
+
+        alert("Erro de conexão ao liberar as mesas.");
+        botao.disabled = false;
+        botao.textContent = "Liberar todas";
+
+    }
 
 }
 
@@ -508,8 +1119,329 @@ document.querySelectorAll(".filtros button").forEach(botao => {
 
 });
 
+document.getElementById("btn-abrir-liberar-todas").addEventListener("click", abrirModalLiberarTodas);
+
+document.getElementById("btn-cancelar-liberar-todas").addEventListener("click", fecharModalLiberarTodas);
+
+document.getElementById("input-confirma-liberar-todas").addEventListener("input", e => {
+
+    document.getElementById("btn-confirmar-liberar-todas").disabled =
+        e.target.value.trim().toUpperCase() !== "LIBERAR";
+
+});
+
+document.getElementById("btn-confirmar-liberar-todas").addEventListener("click", liberarTodas);
+
+// ===================== Editar mesa =====================
+
+let mesaEmEdicao = null;
+
+function abrirModalEditarMesa(idMesa) {
+
+    const mesa = mesasCache.find(m => String(m.id) === String(idMesa));
+    if (!mesa) return;
+
+    mesaEmEdicao = mesa;
+
+    document.getElementById("titulo-editar-mesa").textContent = "Editar Mesa " + mesa.id;
+    document.getElementById("input-editar-nome").value = mesa.reservadoPor || "";
+    document.getElementById("input-editar-contato").value = mesa.contato || "";
+    document.getElementById("input-editar-preco").value = mesa.preco || "";
+    document.getElementById("input-editar-observacao").value = mesa.observacao || "";
+    document.getElementById("input-editar-hold").value = "";
+
+    const checkPaga = document.getElementById("input-editar-marcar-paga");
+    checkPaga.checked = false;
+    checkPaga.disabled = mesa.status === "PAGA";
+
+    document.getElementById("modal-editar-mesa").classList.remove("oculto");
+    fecharLinhaAberta();
+
+}
+
+function fecharModalEditarMesa() {
+
+    document.getElementById("modal-editar-mesa").classList.add("oculto");
+    mesaEmEdicao = null;
+
+}
+
+async function salvarEdicaoMesa() {
+
+    if (!mesaEmEdicao) return;
+
+    const campos = {
+        nome: document.getElementById("input-editar-nome").value,
+        contato: document.getElementById("input-editar-contato").value,
+        observacao: document.getElementById("input-editar-observacao").value
+    };
+
+    const preco = document.getElementById("input-editar-preco").value;
+    if (preco !== "") campos.preco = preco;
+
+    const holdMinutos = document.getElementById("input-editar-hold").value;
+    if (holdMinutos !== "") campos.estenderHoldMinutos = holdMinutos;
+
+    if (document.getElementById("input-editar-marcar-paga").checked) campos.marcarPaga = true;
+
+    const botao = document.getElementById("btn-confirmar-editar-mesa");
+    botao.disabled = true;
+    botao.textContent = "Salvando…";
+
+    try {
+
+        const dados = await chamarApi("editarMesaAdmin", { idMesa: mesaEmEdicao.id, campos: campos });
+
+        if (!dados.ok) {
+            alert(dados.erro || "Não foi possível salvar as alterações.");
+            return;
+        }
+
+        fecharModalEditarMesa();
+        await carregarReservas();
+
+    } catch (erro) {
+
+        alert("Erro de conexão ao salvar a mesa.");
+
+    } finally {
+
+        botao.disabled = false;
+        botao.textContent = "Salvar";
+
+    }
+
+}
+
+document.getElementById("btn-cancelar-editar-mesa").addEventListener("click", fecharModalEditarMesa);
+document.getElementById("btn-confirmar-editar-mesa").addEventListener("click", salvarEdicaoMesa);
+
+// ===================== Editar preço por setor =====================
+
+function abrirModalPrecoSetor() {
+
+    const setores = [...new Set(mesasCache.map(m => m.setor).filter(Boolean))];
+
+    const select = document.getElementById("select-preco-setor");
+    select.innerHTML = setores.map(s => `<option value="${s}">${s}</option>`).join("");
+
+    document.getElementById("input-preco-setor").value = "";
+    document.getElementById("modal-preco-setor").classList.remove("oculto");
+
+}
+
+function fecharModalPrecoSetor() {
+
+    document.getElementById("modal-preco-setor").classList.add("oculto");
+
+}
+
+async function salvarPrecoSetor() {
+
+    const setor = document.getElementById("select-preco-setor").value;
+    const novoPreco = document.getElementById("input-preco-setor").value;
+
+    if (!setor || novoPreco === "") {
+        alert("Escolha um setor e informe o novo preço.");
+        return;
+    }
+
+    const botao = document.getElementById("btn-confirmar-preco-setor");
+    botao.disabled = true;
+    botao.textContent = "Salvando…";
+
+    try {
+
+        const dados = await chamarApi("editarPrecoSetorAdmin", { setor: setor, novoPreco: novoPreco });
+
+        if (!dados.ok) {
+            alert(dados.erro || "Não foi possível atualizar o preço do setor.");
+            return;
+        }
+
+        fecharModalPrecoSetor();
+        await carregarReservas();
+
+    } catch (erro) {
+
+        alert("Erro de conexão ao atualizar o preço.");
+
+    } finally {
+
+        botao.disabled = false;
+        botao.textContent = "Salvar";
+
+    }
+
+}
+
+document.getElementById("btn-abrir-preco-setor").addEventListener("click", abrirModalPrecoSetor);
+document.getElementById("btn-cancelar-preco-setor").addEventListener("click", fecharModalPrecoSetor);
+document.getElementById("btn-confirmar-preco-setor").addEventListener("click", salvarPrecoSetor);
+
+// ===================== Liberar reservadas agora =====================
+
+async function liberarReservadasAgora() {
+
+    const confirmar = texto => new Promise(resolve => {
+
+        if (window.Telegram && Telegram.WebApp && Telegram.WebApp.showConfirm) {
+            Telegram.WebApp.showConfirm(texto, resolve);
+        } else {
+            resolve(window.confirm(texto));
+        }
+
+    });
+
+    const confirmado = await confirmar("Liberar agora todas as mesas com status RESERVADA (mesas pagas não são afetadas)?");
+    if (!confirmado) return;
+
+    try {
+
+        const dados = await chamarApi("liberarMesasReservadasAdmin", {});
+
+        if (!dados.ok) {
+            alert(dados.erro || "Não foi possível liberar as mesas reservadas.");
+            return;
+        }
+
+        await carregarReservas();
+
+    } catch (erro) {
+
+        alert("Erro de conexão ao liberar as mesas reservadas.");
+
+    }
+
+}
+
+document.getElementById("btn-liberar-reservadas").addEventListener("click", liberarReservadasAgora);
+
+// ===================== Gatilho: liberar reservadas agendado =====================
+
+async function carregarGatilho() {
+
+    const caixa = document.getElementById("caixa-gatilho");
+
+    try {
+
+        const dados = await chamarApi("obterGatilhoLiberarReservadas", {});
+
+        if (!dados.ok) {
+            caixa.textContent = "Não foi possível carregar o agendamento.";
+            return;
+        }
+
+        if (!dados.gatilho) {
+
+            caixa.innerHTML = `
+                <span>Nenhuma liberação agendada.</span>
+                <button id="btn-abrir-gatilho">Agendar</button>
+            `;
+
+            document.getElementById("btn-abrir-gatilho").addEventListener("click", abrirModalGatilho);
+
+        } else {
+
+            const dataFormatada = new Date(dados.gatilho.dataHoraAlvo).toLocaleString("pt-BR");
+
+            caixa.innerHTML = `
+                <span>Liberação agendada para <b>${dataFormatada}</b></span>
+                <button id="btn-cancelar-gatilho-ativo">Cancelar</button>
+            `;
+
+            document.getElementById("btn-cancelar-gatilho-ativo").addEventListener("click", cancelarGatilhoAtivo);
+
+        }
+
+    } catch (erro) {
+
+        caixa.textContent = "Erro ao carregar o agendamento.";
+
+    }
+
+}
+
+function abrirModalGatilho() {
+
+    document.getElementById("input-gatilho-data").value = "";
+    document.getElementById("modal-gatilho").classList.remove("oculto");
+
+}
+
+function fecharModalGatilho() {
+
+    document.getElementById("modal-gatilho").classList.add("oculto");
+
+}
+
+async function confirmarGatilho() {
+
+    const valor = document.getElementById("input-gatilho-data").value;
+
+    if (!valor) {
+        alert("Escolha uma data e hora.");
+        return;
+    }
+
+    const botao = document.getElementById("btn-confirmar-gatilho");
+    botao.disabled = true;
+    botao.textContent = "Agendando…";
+
+    try {
+
+        const dataHoraISO = new Date(valor).toISOString();
+
+        const dados = await chamarApi("criarGatilhoLiberarReservadas", { dataHoraISO: dataHoraISO });
+
+        if (!dados.ok) {
+            alert(dados.erro || "Não foi possível agendar.");
+            return;
+        }
+
+        fecharModalGatilho();
+        await carregarGatilho();
+
+    } catch (erro) {
+
+        alert("Erro de conexão ao agendar.");
+
+    } finally {
+
+        botao.disabled = false;
+        botao.textContent = "Agendar";
+
+    }
+
+}
+
+async function cancelarGatilhoAtivo() {
+
+    try {
+
+        const dados = await chamarApi("cancelarGatilhoLiberarReservadas", {});
+
+        if (!dados.ok) {
+            alert(dados.erro || "Não foi possível cancelar o agendamento.");
+            return;
+        }
+
+        await carregarGatilho();
+
+    } catch (erro) {
+
+        alert("Erro de conexão ao cancelar o agendamento.");
+
+    }
+
+}
+
+document.getElementById("btn-cancelar-gatilho").addEventListener("click", fecharModalGatilho);
+document.getElementById("btn-confirmar-gatilho").addEventListener("click", confirmarGatilho);
+
 iniciarTelegram();
 carregarReservas();
+carregarGatilho();
 
 </script>
 

@@ -27,6 +27,21 @@ import {
 
 
 
+// =====================================================
+// ATUALIZAÇÃO PERIÓDICA (POLLING) DO MAPA PÚBLICO
+// A cada POLL_MS milissegundos, o front-end busca de novo
+// o estado das mesas no backend (carregarMesas), para que
+// o mapa reflita reservas/liberações feitas por outras
+// pessoas em tempo quase-real.
+//
+// Valor atual: 20000 ms (20 segundos) — bom para testes,
+// mas é bastante agressivo para um evento com muita gente
+// no Mini App ao mesmo tempo (gera muitas chamadas ao
+// Apps Script). EM PRODUÇÃO, considere aumentar este valor
+// (ex: 30000–60000) para reduzir carga no backend/cota do
+// Apps Script, balanceando com a "velocidade" desejada de
+// atualização do mapa.
+// =====================================================
 const POLL_MS = 20000;
 
 
@@ -329,6 +344,9 @@ async function iniciarAplicacao() {
 
 
 
+    // Ver comentário de POLL_MS no topo do arquivo — ajustar
+    // esse intervalo em produção conforme o volume esperado
+    // de acessos simultâneos.
     setInterval(
         carregarMesas,
         POLL_MS
