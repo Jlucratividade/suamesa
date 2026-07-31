@@ -439,104 +439,49 @@ export function toggleSelecao(id) {
 
 
 
-
-// =====================================================
-// Atualiza resumo inferior
-// =====================================================
-
 export function atualizarResumo() {
-
 
     const resumo =
         document.getElementById(
             "resumo-selecao"
         );
 
+    // Não precisamos mais pegar o "botao" aqui diretamente, 
+    // pois a função verificarHabilitacaoBotao vai cuidar disso.
 
-
-    const botao =
-        document.getElementById(
-            "btnReservar"
-        );
-
-
-
-
-
-
-    if (
-        selecionadas.size === 0
-    ) {
-
+    if (selecionadas.size === 0) {
 
         resumo.textContent =
             "Nenhuma mesa selecionada.";
 
-
-
-        botao.disabled =
-            true;
-
-
-
-        botao.textContent =
-            "Selecione ao menos 1 mesa";
-
-
+        // Chama a função passando 0 para forçar o estado desabilitado
+        verificarHabilitacaoBotao(0);
 
         return;
-
-
     }
-
-
-
-
-
-
 
     const lista =
         Array.from(selecionadas)
             .join(", ");
 
-
-
-
-
     const total =
         mesasState
-
             .filter(m =>
                 selecionadas.has(
                     String(m.id)
                 )
             )
-
             .reduce(
-                (soma,m) =>
+                (soma, m) =>
                     soma + Number(m.preco),
                 0
             );
 
-
-
-
-
-
     resumo.textContent =
         `Mesas: ${lista} · Total: R$ ${total.toFixed(2)}`;
 
-
-
-
-
-    botao.disabled =
-        false;
-
-
-
-    botao.textContent =
-        "Reservar e ir para pagamento";
-
+    // CORREÇÃO: Em vez de forçar disabled = false, 
+    // delegamos a decisão para a função que valida nome e contato também
+    verificarHabilitacaoBotao(selecionadas.size);
 
 }
