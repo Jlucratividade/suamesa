@@ -45,13 +45,17 @@ function validarContato() {
 // ← NOVA FUNÇÃO: verifica se pode habilitar o botão
 export function verificarHabilitacaoBotao(mesasSelecionadasCount) {
 
-    const btnReservar = document.getElementById("btnReservar");
-
-    if (!btnReservar) return;
+    console.log("mesasSelecionadasCount =", mesasSelecionadasCount);
 
     const nomeValido = validarNome();
     const contatoValido = validarContato();
+
+    console.log("nomeValido =", nomeValido);
+    console.log("contatoValido =", contatoValido);
+
     const temMesas = mesasSelecionadasCount > 0;
+
+    console.log("temMesas =", temMesas);
 
     if (temMesas && nomeValido && contatoValido) {
 
