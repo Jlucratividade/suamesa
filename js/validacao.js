@@ -44,22 +44,31 @@ function validarContato() {
 
 // ← NOVA FUNÇÃO: verifica se pode habilitar o botão
 export function verificarHabilitacaoBotao(mesasSelecionadasCount) {
-  if (!btnReservar) return;
-  
-  const nomeValido = validarNome();
-  const contatoValido = validarContato();
-  const temMesas = mesasSelecionadasCount > 0;
-  
-  if (temMesas && nomeValido && contatoValido) {
-    btnReservar.disabled = false;
-    btnReservar.textContent = "Reservar e ir para pagamento";
-  } else if (!temMesas) {
-    btnReservar.disabled = true;
-    btnReservar.textContent = "Selecione ao menos 1 mesa";
-  } else {
-    btnReservar.disabled = true;
-    btnReservar.textContent = "Preencha nome e WhatsApp corretamente";
-  }
+
+    const btnReservar = document.getElementById("btnReservar");
+
+    if (!btnReservar) return;
+
+    const nomeValido = validarNome();
+    const contatoValido = validarContato();
+    const temMesas = mesasSelecionadasCount > 0;
+
+    if (temMesas && nomeValido && contatoValido) {
+
+        btnReservar.disabled = false;
+        btnReservar.textContent = "Reservar e ir para pagamento";
+
+    } else if (!temMesas) {
+
+        btnReservar.disabled = true;
+        btnReservar.textContent = "Selecione ao menos 1 mesa";
+
+    } else {
+
+        btnReservar.disabled = true;
+        btnReservar.textContent = "Preencha nome e WhatsApp corretamente";
+
+    }
 }
 
 // Inicializa eventos
