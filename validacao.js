@@ -4,86 +4,77 @@
 
 const nome = document.getElementById("nome");
 const contato = document.getElementById("contato");
-
-
-// Validação do nome
-function validarNome() {
-
-    const valor = nome.value.trim();
-
-    if (valor === "") {
-
-        nome.setCustomValidity(
-            "Digite seu nome completo."
-        );
-
-        return false;
-
-    } else if (valor.length < 5) {
-
-        nome.setCustomValidity(
-            "O nome deve ter pelo menos 5 caracteres."
-        );
-
-        return false;
-
-    } else if (!/^[A-Za-zÀ-ÿ]+(\s+[A-Za-zÀ-ÿ]+)+$/.test(valor)) {
-
-        nome.setCustomValidity(
-            "Digite nome e sobrenome usando apenas letras."
-        );
-
-        return false;
-
-    }
-
-    nome.setCustomValidity("");
-    return true;
-}
-
+const btnReservar = document.getElementById("btnReservar");
 
 // Validação do WhatsApp
 function validarContato() {
+  const numero = contato.value.replace(/\D/g, "");
+  contato.value = numero;
+  
+  if (numero === "") {
+    contato.setCustomValidity("Digite seu WhatsApp.");
+    return false;
+  } else if (numero.length !== 11) {
+    contato.setCustomValidity("O WhatsApp deve ter 11 números com DDD.");
+    return false;
+  }
+  
+  contato.setCustomValidity("");
+  return true;
+}
 
-    const numero = contato.value.replace(/\D/g, "");
+// ← NOVA FUNÇÃO: verifica se pode habilitar o botão
+export function verificarHabilitacaoBotao(mesasSelecionadasCount) {
 
-    contato.value = numero;
+    console.log("mesasSelecionadasCount =", mesasSelecionadasCount);
 
-    if (numero === "") {
+    const nomeValido = validarNome();
+    const contatoValido = validarContato();
 
-        contato.setCustomValidity(
-            "Digite seu WhatsApp."
-        );
+    console.log("nomeValido =", nomeValido);
+    console.log("contatoValido =", contatoValido);
 
-        return false;
+    const temMesas = mesasSelecionadasCount > 0;
 
-    } else if (numero.length !== 11) {
+    console.log("temMesas =", temMesas);
 
-        contato.setCustomValidity(
-            "O WhatsApp deve ter 11 números com DDD."
-        );
+    if (temMesas && nomeValido && contatoValido) {
 
-        return false;
+        btnReservar.disabled = false;
+        btnReservar.textContent = "Reservar e ir para pagamento";
+
+    } else if (!temMesas) {
+
+        btnReservar.disabled = true;
+        btnReservar.textContent = "Selecione ao menos 1 mesa";
+
+    } else {
+
+        btnReservar.disabled = true;
+        btnReservar.textContent = "Preencha nome e WhatsApp corretamente";
 
     }
-
-    contato.setCustomValidity("");
-    return true;
 }
 
 // Inicializa eventos
 export function iniciarValidacao() {
-
-    nome.addEventListener("input", validarNome);
-
-    contato.addEventListener("input", validarContato);
-
+  nome.addEventListener("input", () => {
+    validarNome();
+    // ← Chama verificação do botão a cada digitação
+    const selecionadas = document.querySelector('.selecionada');
+    const count = document.querySelectorAll('.selecionada').length;
+    verificarHabilitacaoBotao(count);
+  });
+  
+  contato.addEventListener("input", () => {
+    validarContato();
+    // ← Chama verificação do botão a cada digitação
+    const count = document.querySelectorAll('.selecionada').length;
+    verificarHabilitacaoBotao(count);
+  });
 }
-
 
 // Validação para uso em outros arquivos
 export function validarFormulario() {
-
-    return validarNome() && validarContato();
-
+  return validarNome() && validarContato();
 }
