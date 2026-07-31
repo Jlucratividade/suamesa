@@ -9,6 +9,13 @@
 <body>
     <h1>Ares Atlântico — Mapa de Mesas</h1>
     
+    <div class="legenda">
+        <span><i class="dot livre"></i> Livre</span>
+        <span><i class="dot reservada"></i> Reservada (hold)</span>
+        <span><i class="dot paga"></i> Vendida</span>
+        <span><i class="dot selecionada"></i> Selecionada por você</span>
+    </div>
+
     <div class="acoes-superiores" style="margin-bottom: 15px; display: flex; gap: 10px;">
         <button id="btnAtualizarMapa" class="btn-secundario">
             🔄 Atualizar Mapa
@@ -18,19 +25,19 @@
         </button>
     </div>
 
-    <div class="legenda">
-        <span><i class="dot livre"></i> Livre</span>
-        <span><i class="dot reservada"></i> Reservada (hold)</span>
-        <span><i class="dot paga"></i> Vendida</span>
-        <span><i class="dot selecionada"></i> Selecionada por você</span>
-    </div>
-
     <div id="mapaImagemWrapper" class="oculto">
         <div id="mapaImagemContainer">
+            <!-- Indicador de loading -->
+            <div id="loadingImagem" class="loading-overlay">
+                <div class="loading-spinner"></div>
+                <span>Processando imagem...</span>
+            </div>
+            
             <img 
                 id="mapaImagem"
-                src="https://res.cloudinary.com/db4i3tch0/image/upload/v1785236888/Projeto%20Mapa%20de%20Mesas/map_edited_uniform_kjpdf8.webp"
-                alt="Mapa das mesas">
+                src=""
+                alt="Mapa das mesas"
+                style="display: none;">
         </div>
     </div>
 
