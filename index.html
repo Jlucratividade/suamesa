@@ -72,61 +72,6 @@
   oninput="this.value=this.value.replace(/\D/g,'')"
   required>
 
-<script>
-    const nome = document.getElementById("nome");
-const contato = document.getElementById("contato");
-
-nome.addEventListener("input", function () {
-
-  if (nome.value.trim() === "") {
-
-    nome.setCustomValidity(
-      "Digite seu nome completo."
-    );
-
-  } else if (nome.value.trim().length < 5) {
-
-    nome.setCustomValidity(
-      "O nome deve ter pelo menos 5 caracteres."
-    );
-
-  } else if (!/^[A-Za-zÀ-ÿ]+(\s+[A-Za-zÀ-ÿ]+)+$/.test(nome.value)) {
-
-    nome.setCustomValidity(
-      "Digite nome e sobrenome usando apenas letras."
-    );
-
-  } else {
-
-    nome.setCustomValidity("");
-
-  }
-
-});
-
-
-contato.addEventListener("input", function () {
-
-  if (contato.value === "") {
-
-    contato.setCustomValidity(
-      "Digite seu WhatsApp."
-    );
-
-  } else if (contato.value.length < 11) {
-
-    contato.setCustomValidity(
-      "O WhatsApp deve ter 11 números com DDD."
-    );
-
-  } else {
-
-    contato.setCustomValidity("");
-
-  }
-
-});
-</script>
         <button id="btnReservar" disabled>
             Selecione ao menos 1 mesa
         </button>
