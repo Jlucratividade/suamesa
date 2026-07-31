@@ -71,7 +71,6 @@ function validarContato() {
     return true;
 }
 
-
 // Inicializa eventos
 export function iniciarValidacao() {
 
