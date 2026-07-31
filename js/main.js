@@ -159,7 +159,7 @@ async function carregarImagemComCache() {
 }
 
 // =====================================================
-// Botão mostrar mapa impresso
+// Botão mostrar/ocultar mapa impresso
 // =====================================================
 function configurarMapaImagem() {
     const botao = document.getElementById("btnToggleMapa");
