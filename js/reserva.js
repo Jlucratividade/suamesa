@@ -2,7 +2,7 @@
 // RESERVAS
 // Controle do fluxo de reserva das mesas
 // =====================================================
-
+import { validarFormulario } from "./validacao.js";
 import { reservarMesas, cancelarReserva } from "./api.js";
 import { selecionadas, atualizarResumo, mesasState } from "./mapa.js";
 
@@ -36,8 +36,8 @@ async function executarReserva() {
     const contato = document.getElementById("contato").value.trim();
     const status = document.getElementById("status-msg");
 
-    if (!nome || !contato) {
-        status.textContent = "Preencha nome e contato antes de reservar.";
+    if (!validarFormulario()) {
+        status.textContent = "Corrija os dados antes de continuar.";
         return;
     }
 
