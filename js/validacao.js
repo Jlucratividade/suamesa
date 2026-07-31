@@ -2,6 +2,8 @@
 // VALIDAÇÕES DOS CAMPOS DO FORMULÁRIO
 // =====================================================
 
+import { selecionadas } from "./mapa.js";
+
 const nome = document.getElementById("nome");
 const contato = document.getElementById("contato");
 const btnReservar = document.getElementById("btnReservar");
@@ -79,16 +81,13 @@ export function iniciarValidacao() {
   nome.addEventListener("input", () => {
     validarNome();
     // ← Chama verificação do botão a cada digitação
-    const selecionadas = document.querySelector('.selecionada');
-    const count = document.querySelectorAll('.selecionada').length;
-    verificarHabilitacaoBotao(count);
+    verificarHabilitacaoBotao(selecionadas.size);
   });
   
   contato.addEventListener("input", () => {
     validarContato();
     // ← Chama verificação do botão a cada digitação
-    const count = document.querySelectorAll('.selecionada').length;
-    verificarHabilitacaoBotao(count);
+    verificarHabilitacaoBotao(selecionadas.size);
   });
 }
 
