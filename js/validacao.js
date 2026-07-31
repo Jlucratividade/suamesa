@@ -7,22 +7,27 @@ const contato = document.getElementById("contato");
 const btnReservar = document.getElementById("btnReservar");
 
 // Validação do nome
-function validarNome() {
-  const valor = nome.value.trim();
-  
-  if (valor === "") {
-    nome.setCustomValidity("Digite seu nome completo.");
-    return false;
-  } else if (valor.length < 5) {
-    nome.setCustomValidity("O nome deve ter pelo menos 5 caracteres.");
-    return false;
-  } else if (!/^[A-Za-zÀ-]+(\s+[A-Za-zÀ-]+)+$/.test(valor)) {
-    nome.setCustomValidity("Digite nome e sobrenome usando apenas letras.");
-    return false;
-  }
-  
-  nome.setCustomValidity("");
-  return true;
+function validarContato() {
+
+    const numero = contato.value.replace(/\D/g, "");
+
+    console.log(numero);
+    console.log(numero.length);
+
+    contato.value = numero;
+
+    if (numero === "") {
+        contato.setCustomValidity("Digite seu WhatsApp.");
+        return false;
+    }
+
+    if (numero.length !== 11) {
+        contato.setCustomValidity("O WhatsApp deve ter 11 números com DDD.");
+        return false;
+    }
+
+    contato.setCustomValidity("");
+    return true;
 }
 
 // Validação do WhatsApp
