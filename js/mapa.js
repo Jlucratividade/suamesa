@@ -1,3 +1,5 @@
+import { verificarHabilitacaoBotao } from "./validacao.js";
+
 // =====================================================
 // MAPA - Renderização e seleção das mesas
 // =====================================================
