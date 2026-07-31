@@ -6,30 +6,6 @@ const nome = document.getElementById("nome");
 const contato = document.getElementById("contato");
 const btnReservar = document.getElementById("btnReservar");
 
-// Validação do nome
-function validarContato() {
-
-    const numero = contato.value.replace(/\D/g, "");
-
-    console.log(numero);
-    console.log(numero.length);
-
-    contato.value = numero;
-
-    if (numero === "") {
-        contato.setCustomValidity("Digite seu WhatsApp.");
-        return false;
-    }
-
-    if (numero.length !== 11) {
-        contato.setCustomValidity("O WhatsApp deve ter 11 números com DDD.");
-        return false;
-    }
-
-    contato.setCustomValidity("");
-    return true;
-}
-
 // Validação do WhatsApp
 function validarContato() {
   const numero = contato.value.replace(/\D/g, "");
