@@ -158,10 +158,7 @@ async function executarPagamento() {
 
 
             botao.textContent =
-                "Pagar com Pix ou Cartão";
-
-
-
+                "Pagar agora (opcional)";
         }
 
 
@@ -189,7 +186,7 @@ async function executarPagamento() {
 
 
         botao.textContent =
-            "Pagar com Pix ou Cartão";
+            "Pagar agora (opcional)";
 
 
 
