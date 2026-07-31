@@ -6,6 +6,24 @@ const nome = document.getElementById("nome");
 const contato = document.getElementById("contato");
 const btnReservar = document.getElementById("btnReservar");
 
+// Validação do nome
+function validarNome() {
+  const valor = nome.value.trim();
+
+  if (valor === "") {
+    nome.setCustomValidity("Digite seu nome.");
+    return false;
+  }
+
+  if (valor.length < 3) {
+    nome.setCustomValidity("O nome deve ter pelo menos 3 letras.");
+    return false;
+  }
+
+  nome.setCustomValidity("");
+  return true;
+}
+
 // Validação do WhatsApp
 function validarContato() {
   const numero = contato.value.replace(/\D/g, "");
