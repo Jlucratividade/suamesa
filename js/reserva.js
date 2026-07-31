@@ -59,7 +59,7 @@ async function executarReserva() {
         const ids = mesasIndisponiveis.map(m => m.id).join(", ");
         status.textContent = `Conflito: A(s) mesa(s) ${ids} já não está(ão) disponível(eis). Selecione outras.`;
         btn.disabled = false;
-        btn.textContent = "Reservar e ir para pagamento";
+        btn.textContent = "Reservar";
         return;
     }
 
@@ -92,14 +92,14 @@ async function executarReserva() {
             const btnPagar = document.getElementById("btnPagar");
             btnPagar.classList.remove("oculto");
             btnPagar.disabled = false;
-            btnPagar.textContent = "Pagar com Pix ou Cartão";
+            btnPagar.textContent = "Pagar agora (opcional)";
         } else {
             // 6. Quando uma tentativa de escrita falha por conflito
             status.textContent = "Erro: " + resposta.erro;
             await refreshMapa(); // Atualiza para mostrar o estado real
             
             btn.disabled = false;
-            btn.textContent = "Reservar e ir para pagamento";
+            btn.textContent = "Reservar";
         }
     } catch(erro) {
         status.textContent = "Erro de comunicação: " + erro.message;
@@ -107,7 +107,7 @@ async function executarReserva() {
         await refreshMapa();
         
         btn.disabled = false;
-        btn.textContent = "Reservar e ir para pagamento";
+        btn.textContent = "Reservar";
     }
 }
 
