@@ -255,7 +255,7 @@ async function iniciarAplicacao() {
     configurarBotaoAtualizar();
     
     // Inicializa módulos
-    iniciarValidacao();
+    iniciarReserva(carregarMesas);
     iniciarReserva();
     iniciarPagamento();
 }
