@@ -298,6 +298,8 @@
         height: 100%;
         width: 168px;
         display: flex;
+        border-radius: 0 10px 10px 0;
+        overflow: hidden;
 
     }
 
@@ -330,6 +332,7 @@
         gap: 10px;
         position: relative;
         z-index: 1;
+        width: 100%;
         transition: transform .18s ease;
         touch-action: pan-y;
 
@@ -713,10 +716,10 @@
     <div class="modal-caixa">
         <b id="titulo-editar-mesa">Editar mesa</b>
 
-        <label for="input-editar-nome">Nome</label>
+        <label for="input-editar-nome" id="label-editar-nome">Nome</label>
         <input type="text" id="input-editar-nome" autocomplete="off">
 
-        <label for="input-editar-contato">Contato</label>
+        <label for="input-editar-contato" id="label-editar-contato">Contato</label>
         <input type="text" id="input-editar-contato" autocomplete="off">
 
         <label for="input-editar-preco">Preço (R$)</label>
@@ -1232,7 +1235,7 @@ function renderizar() {
 
         const acaoEditar = document.createElement("button");
         acaoEditar.className = "linha-acao editar";
-        acaoEditar.textContent = "Editar";
+        acaoEditar.textContent = mesa.status === "LIVRE" ? "Cadastrar" : "Editar";
         acaoEditar.addEventListener("click", () => abrirModalEditarMesa(mesa.id));
         acoes.appendChild(acaoEditar);
 
@@ -1497,6 +1500,7 @@ document.getElementById("btn-confirmar-liberar-todas").addEventListener("click",
 // ===================== Editar mesa =====================
 
 let mesaEmEdicao = null;
+let modoCadastroManual = false;
 
 function abrirModalEditarMesa(idMesa) {
 
@@ -1504,8 +1508,19 @@ function abrirModalEditarMesa(idMesa) {
     if (!mesa) return;
 
     mesaEmEdicao = mesa;
+    modoCadastroManual = mesa.status === "LIVRE";
 
-    document.getElementById("titulo-editar-mesa").textContent = "Editar Mesa " + mesa.id;
+    document.getElementById("titulo-editar-mesa").textContent =
+        modoCadastroManual
+            ? "Cadastrar reserva — Mesa " + mesa.id
+            : "Editar Mesa " + mesa.id;
+
+    document.getElementById("label-editar-nome").textContent =
+        "Nome" + (modoCadastroManual ? " *" : "");
+
+    document.getElementById("label-editar-contato").textContent =
+        "Contato" + (modoCadastroManual ? " *" : "");
+
     document.getElementById("input-editar-nome").value = mesa.reservadoPor || "";
     document.getElementById("input-editar-contato").value = mesa.contato || "";
     document.getElementById("input-editar-preco").value = mesa.preco || "";
@@ -1516,6 +1531,14 @@ function abrirModalEditarMesa(idMesa) {
     checkPaga.checked = false;
     checkPaga.disabled = mesa.status === "PAGA";
 
+    document.querySelector('label[for="input-editar-marcar-paga"]').textContent =
+        modoCadastroManual
+            ? "Cadastrar já como paga"
+            : "Marcar como paga manualmente";
+
+    document.getElementById("btn-confirmar-editar-mesa").textContent =
+        modoCadastroManual ? "Cadastrar" : "Salvar";
+
     document.getElementById("modal-editar-mesa").classList.remove("oculto");
     fecharLinhaAberta();
 
@@ -1525,6 +1548,7 @@ function fecharModalEditarMesa() {
 
     document.getElementById("modal-editar-mesa").classList.add("oculto");
     mesaEmEdicao = null;
+    modoCadastroManual = false;
 
 }
 
@@ -1532,27 +1556,64 @@ async function salvarEdicaoMesa() {
 
     if (!mesaEmEdicao) return;
 
-    const campos = {
-        nome: document.getElementById("input-editar-nome").value,
-        contato: document.getElementById("input-editar-contato").value,
-        observacao: document.getElementById("input-editar-observacao").value
-    };
+    const nome = document.getElementById("input-editar-nome").value.trim();
+    const contato = document.getElementById("input-editar-contato").value.trim();
 
-    const preco = document.getElementById("input-editar-preco").value;
-    if (preco !== "") campos.preco = preco;
+    if (modoCadastroManual && !nome) {
+        alert("Informe o nome de quem está reservando.");
+        return;
+    }
 
-    const holdMinutos = document.getElementById("input-editar-hold").value;
-    if (holdMinutos !== "") campos.estenderHoldMinutos = holdMinutos;
-
-    if (document.getElementById("input-editar-marcar-paga").checked) campos.marcarPaga = true;
+    if (modoCadastroManual && !contato) {
+        alert("Informe um contato (telefone/WhatsApp) para a reserva.");
+        return;
+    }
 
     const botao = document.getElementById("btn-confirmar-editar-mesa");
     botao.disabled = true;
-    botao.textContent = "Salvando…";
+    botao.textContent = modoCadastroManual ? "Cadastrando…" : "Salvando…";
 
     try {
 
-        const dados = await chamarApi("editarMesaAdmin", { idMesa: mesaEmEdicao.id, campos: campos });
+        let dados;
+
+        if (modoCadastroManual) {
+
+            const dadosCadastro = {
+                nome: nome,
+                contato: contato,
+                observacao: document.getElementById("input-editar-observacao").value
+            };
+
+            const preco = document.getElementById("input-editar-preco").value;
+            if (preco !== "") dadosCadastro.preco = preco;
+
+            const holdMinutos = document.getElementById("input-editar-hold").value;
+            if (holdMinutos !== "") dadosCadastro.holdMinutos = holdMinutos;
+
+            if (document.getElementById("input-editar-marcar-paga").checked) dadosCadastro.marcarPaga = true;
+
+            dados = await chamarApi("cadastrarReservaManualAdmin", { idMesa: mesaEmEdicao.id, dados: dadosCadastro });
+
+        } else {
+
+            const campos = {
+                nome: nome,
+                contato: contato,
+                observacao: document.getElementById("input-editar-observacao").value
+            };
+
+            const preco = document.getElementById("input-editar-preco").value;
+            if (preco !== "") campos.preco = preco;
+
+            const holdMinutos = document.getElementById("input-editar-hold").value;
+            if (holdMinutos !== "") campos.estenderHoldMinutos = holdMinutos;
+
+            if (document.getElementById("input-editar-marcar-paga").checked) campos.marcarPaga = true;
+
+            dados = await chamarApi("editarMesaAdmin", { idMesa: mesaEmEdicao.id, campos: campos });
+
+        }
 
         if (!dados.ok) {
             alert(dados.erro || "Não foi possível salvar as alterações.");
@@ -1569,7 +1630,7 @@ async function salvarEdicaoMesa() {
     } finally {
 
         botao.disabled = false;
-        botao.textContent = "Salvar";
+        botao.textContent = modoCadastroManual ? "Cadastrar" : "Salvar";
 
     }
 
