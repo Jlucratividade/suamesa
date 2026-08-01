@@ -137,6 +137,116 @@
 
     .controles input[type="search"]::placeholder { color: var(--texto-fraco); }
 
+    .controles select#ordenacao {
+
+        flex: none;
+        background: var(--card);
+        border: 1px solid var(--borda);
+        border-radius: 9px;
+        padding: 9px 8px;
+        color: var(--texto);
+        font-size: 12px;
+        outline: none;
+        max-width: 120px;
+
+    }
+
+    .filtros.filtros-setor button {
+
+        background: var(--card-alto);
+
+    }
+
+    .filtros.filtros-setor button.ativo {
+
+        background: var(--selecionada, #2f6fed);
+
+    }
+
+    /* ===================== Estatísticas por setor ===================== */
+
+    .setor-stats {
+
+        background: var(--card);
+        border: 1px solid var(--borda);
+        border-radius: 10px;
+        margin-bottom: 14px;
+        overflow: hidden;
+
+    }
+
+    .setor-stats summary {
+
+        padding: 10px 12px;
+        font-size: 12px;
+        color: var(--texto-fraco);
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+    }
+
+    .setor-stats summary::-webkit-details-marker { display: none; }
+
+    .setor-stats summary::after {
+
+        content: "▾";
+        font-size: 10px;
+
+    }
+
+    .setor-stats[open] summary::after { content: "▴"; }
+
+    .setor-stats-corpo {
+
+        padding: 0 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+    }
+
+    .setor-stats-linha {
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        border-top: 1px solid var(--borda);
+        padding-top: 6px;
+
+    }
+
+    .setor-stats-linha .nome-setor {
+
+        font-weight: 600;
+        color: var(--texto);
+
+    }
+
+    .setor-stats-linha .detalhe {
+
+        color: var(--texto-fraco);
+        text-align: right;
+
+    }
+
+    .setor-stats-linha .detalhe b { color: var(--pago); }
+
+    /* ===================== Badge de observação interna ===================== */
+
+    .badge-obs {
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        cursor: default;
+
+    }
+
     .filtros {
 
         display: flex;
@@ -542,6 +652,14 @@
 
     <div class="controles">
         <input type="search" id="busca" placeholder="Buscar por mesa, nome ou contato…">
+        <select id="ordenacao" title="Ordenar por">
+            <option value="mesa">Mesa</option>
+            <option value="setor">Setor</option>
+            <option value="preco-desc">Preço ↓</option>
+            <option value="preco-asc">Preço ↑</option>
+            <option value="status">Status</option>
+            <option value="edicao">Última edição</option>
+        </select>
     </div>
 
     <div class="filtros">
@@ -551,10 +669,20 @@
         <button data-filtro="LIVRE">Livres</button>
     </div>
 
+    <div class="filtros filtros-setor" id="filtros-setor">
+        <button class="ativo" data-setor="todos">Todos os setores</button>
+    </div>
+
+    <details class="setor-stats" id="setor-stats">
+        <summary>Estatísticas por setor</summary>
+        <div class="setor-stats-corpo" id="setor-stats-corpo"></div>
+    </details>
+
     <div class="ferramentas-admin">
         <button class="link-perigo" id="btn-abrir-liberar-todas">Liberar todas as mesas</button>
         <button class="link-perigo" id="btn-liberar-reservadas">Liberar reservadas agora</button>
         <button class="link-neutro" id="btn-abrir-preco-setor">Editar preço por setor</button>
+        <button class="link-neutro" id="btn-exportar-csv">Exportar CSV</button>
     </div>
 
     <div class="caixa-gatilho" id="caixa-gatilho">Carregando agendamento…</div>
@@ -653,6 +781,9 @@ const API_URL =
 
 let mesasCache = [];
 let filtroAtual = "todas";
+let filtroSetorAtual = "todos";
+let ordenacaoAtual = "mesa";
+let mesasVisiveisAtuais = [];
 
 // =====================================================
 // MODO DEBUG (opt-in via URL: .../admin/?debug=1)
@@ -761,6 +892,7 @@ async function carregarReservas() {
         document.getElementById("conteudo").classList.remove("oculto");
 
         atualizarHora();
+        renderizarFiltrosSetor();
         renderizar();
 
     }
@@ -795,6 +927,206 @@ function formatarMoeda(valor) {
 
 }
 
+// ===================== Filtro por setor (item 5) =====================
+// Os botões de setor são gerados dinamicamente a partir dos setores
+// que existem nas mesas carregadas — não há lista fixa de setores no
+// código, porque ela pode mudar de evento para evento.
+
+function renderizarFiltrosSetor() {
+
+    const setores = [...new Set(
+        mesasCache.map(m => m.setor).filter(Boolean)
+    )].sort((a, b) => String(a).localeCompare(String(b), "pt-BR"));
+
+    // Se o setor selecionado não existe mais nos dados atuais
+    // (ex.: recarregou depois de uma edição), volta para "todos".
+    if (filtroSetorAtual !== "todos" && !setores.includes(filtroSetorAtual)) {
+        filtroSetorAtual = "todos";
+    }
+
+    const container = document.getElementById("filtros-setor");
+
+    const botoes = [`<button data-setor="todos" class="${filtroSetorAtual === "todos" ? "ativo" : ""}">Todos os setores</button>`]
+        .concat(setores.map(s => `<button data-setor="${s}" class="${filtroSetorAtual === s ? "ativo" : ""}">${s}</button>`));
+
+    container.innerHTML = botoes.join("");
+
+    container.querySelectorAll("button").forEach(botao => {
+
+        botao.addEventListener("click", () => {
+
+            container.querySelectorAll("button").forEach(b => b.classList.remove("ativo"));
+            botao.classList.add("ativo");
+            filtroSetorAtual = botao.dataset.setor;
+            renderizar();
+
+        });
+
+    });
+
+    // Se só existe um setor (ou nenhum), não faz sentido mostrar o filtro.
+    container.classList.toggle("oculto", setores.length <= 1);
+
+}
+
+// ===================== Ordenações adicionais (item 3) =====================
+
+function ordenarMesas(lista) {
+
+    const copia = [...lista];
+
+    const numeroMesa = id => {
+        const n = parseInt(String(id).replace(/\D/g, ""), 10);
+        return isNaN(n) ? Number.MAX_SAFE_INTEGER : n;
+    };
+
+    switch (ordenacaoAtual) {
+
+        case "setor":
+            return copia.sort((a, b) =>
+                String(a.setor || "").localeCompare(String(b.setor || ""), "pt-BR")
+                || numeroMesa(a.id) - numeroMesa(b.id)
+            );
+
+        case "preco-desc":
+            return copia.sort((a, b) => (Number(b.preco) || 0) - (Number(a.preco) || 0));
+
+        case "preco-asc":
+            return copia.sort((a, b) => (Number(a.preco) || 0) - (Number(b.preco) || 0));
+
+        case "status":
+            return copia.sort((a, b) =>
+                String(a.status || "").localeCompare(String(b.status || ""))
+                || numeroMesa(a.id) - numeroMesa(b.id)
+            );
+
+        case "edicao": {
+
+            const dataOrdenavel = m => {
+                const t = m.horaUltimaEdicao ? new Date(m.horaUltimaEdicao).getTime() : NaN;
+                return isNaN(t) ? -Infinity : t;
+            };
+
+            // Mais recente primeiro; mesas nunca editadas ficam no final.
+            return copia.sort((a, b) => dataOrdenavel(b) - dataOrdenavel(a));
+
+        }
+
+        case "mesa":
+        default:
+            return copia.sort((a, b) => numeroMesa(a.id) - numeroMesa(b.id));
+
+    }
+
+}
+
+// ===================== Estatísticas por setor (item 4) =====================
+// Sempre calculadas sobre TODAS as mesas (mesasCache), não sobre a lista
+// filtrada visível — mesmo princípio dos cards de resumo gerais.
+
+function renderizarEstatisticasSetor() {
+
+    const corpo = document.getElementById("setor-stats-corpo");
+
+    const setores = [...new Set(
+        mesasCache.map(m => m.setor).filter(Boolean)
+    )].sort((a, b) => String(a).localeCompare(String(b), "pt-BR"));
+
+    if (setores.length === 0) {
+        corpo.innerHTML = `<div class="setor-stats-linha"><span class="detalhe">Nenhuma mesa cadastrada.</span></div>`;
+        return;
+    }
+
+    corpo.innerHTML = setores.map(setor => {
+
+        const doSetor = mesasCache.filter(m => m.setor === setor);
+        const livres = doSetor.filter(m => m.status === "LIVRE").length;
+        const reservadas = doSetor.filter(m => m.status === "RESERVADA").length;
+        const pagas = doSetor.filter(m => m.status === "PAGA");
+        const faturado = pagas.reduce((soma, m) => soma + (Number(m.preco) || 0), 0);
+
+        return `
+            <div class="setor-stats-linha">
+                <span class="nome-setor">${setor}</span>
+                <span class="detalhe">
+                    ${doSetor.length} mesa(s) · ${livres} livre(s) · ${reservadas} reservada(s) · ${pagas.length} paga(s)<br>
+                    Faturado: <b>${formatarMoeda(faturado)}</b>
+                </span>
+            </div>
+        `;
+
+    }).join("");
+
+}
+
+// ===================== Exportação CSV (item 14) =====================
+// Exporta exatamente o que está visível na tela no momento (respeita
+// busca + filtro de status + filtro de setor + ordenação atual).
+
+function escaparCampoCSV(valor) {
+
+    const texto = valor === null || valor === undefined ? "" : String(valor);
+
+    if (/[",;\n]/.test(texto)) {
+        return '"' + texto.replace(/"/g, '""') + '"';
+    }
+
+    return texto;
+
+}
+
+function exportarCSV() {
+
+    if (mesasVisiveisAtuais.length === 0) {
+        alert("Não há mesas para exportar com o filtro/busca atual.");
+        return;
+    }
+
+    const cabecalho = [
+        "Mesa", "Setor", "Capacidade", "Preco", "Status",
+        "Reservado_Por", "Contato", "Pago", "Observacao_Interna", "Ultima_Edicao"
+    ];
+
+    const linhas = mesasVisiveisAtuais.map(m => [
+        m.id,
+        m.setor || "",
+        m.capacidade || "",
+        Number(m.preco) || 0,
+        m.status,
+        m.reservadoPor || "",
+        m.contato || "",
+        m.pago || "",
+        m.observacao || "",
+        m.horaUltimaEdicao ? new Date(m.horaUltimaEdicao).toLocaleString("pt-BR") : ""
+    ].map(escaparCampoCSV).join(";"));
+
+    // BOM (\uFEFF) no início para o Excel reconhecer acentuação em UTF-8.
+    const conteudo = "\uFEFF" + cabecalho.join(";") + "\n" + linhas.join("\n");
+
+    const blob = new Blob([conteudo], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const carimbo = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mesas_${carimbo}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+}
+
+document.getElementById("btn-exportar-csv").addEventListener("click", exportarCSV);
+document.getElementById("ordenacao").addEventListener("change", e => {
+
+    ordenacaoAtual = e.target.value;
+    renderizar();
+
+});
+
 function renderizar() {
 
     const termo = document.getElementById("busca").value.trim().toLowerCase();
@@ -817,6 +1149,12 @@ function renderizar() {
 
     }
 
+    if (filtroSetorAtual !== "todos") {
+
+        filtradas = filtradas.filter(m => m.setor === filtroSetorAtual);
+
+    }
+
     if (termo) {
 
         filtradas = filtradas.filter(m => {
@@ -832,6 +1170,11 @@ function renderizar() {
         });
 
     }
+
+    filtradas = ordenarMesas(filtradas);
+    mesasVisiveisAtuais = filtradas;
+
+    renderizarEstatisticasSetor();
 
     const lista = document.getElementById("lista");
     lista.innerHTML = "";
@@ -851,10 +1194,16 @@ function renderizar() {
                 ? "Disponível"
                 : (mesa.reservadoPor || "—") + (mesa.contato ? " · " + mesa.contato : "");
 
+        const temObservacao = Boolean(mesa.observacao && String(mesa.observacao).trim());
+
+        const badgeObs = temObservacao
+            ? `<span class="badge-obs" title="${String(mesa.observacao).replace(/"/g, "&quot;")}">📝</span>`
+            : "";
+
         linha.innerHTML = `
             <div class="bolinha"></div>
             <div class="info">
-                <div class="l1">Mesa ${mesa.id} <span class="setor">${mesa.setor || ""}</span></div>
+                <div class="l1">Mesa ${mesa.id} <span class="setor">${mesa.setor || ""}</span> ${badgeObs}</div>
                 <div class="l2">${quemReservou}</div>
             </div>
             <div class="preco">
@@ -864,6 +1213,19 @@ function renderizar() {
         `;
 
         wrap.appendChild(linha);
+
+        if (temObservacao) {
+
+            const badgeEl = linha.querySelector(".badge-obs");
+
+            badgeEl.addEventListener("click", e => {
+
+                e.stopPropagation();
+                alert("Observação interna — Mesa " + mesa.id + ":\n\n" + mesa.observacao);
+
+            });
+
+        }
 
         const acoes = document.createElement("div");
         acoes.className = "linha-acoes";
