@@ -877,15 +877,12 @@ async function carregarReservas() {
 
             document.getElementById("negado").style.display = "block";
 
-            if (modoDebug) {
+            document.getElementById("negado-debug").textContent =
+                "erro: " + (dados.erro || "(sem mensagem)") +
+                " | URL carregada: " + window.location.href +
+                " | initData: " + (initData ? initData : "(vazio)");
 
-                document.getElementById("negado-debug").textContent =
-                    "[debug] erro: " + (dados.erro || "(sem mensagem)") +
-                    " | initData: " + (initData ? initData : "(vazio)");
-
-                document.getElementById("negado-debug").classList.remove("oculto");
-
-            }
+            document.getElementById("negado-debug").classList.remove("oculto");
 
             return;
 
