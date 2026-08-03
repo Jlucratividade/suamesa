@@ -569,19 +569,6 @@ h1 {
 
 
 
-.btn-pagar {
-
-
-    background:var(--livre) !important;
-
-    margin-top:8px;
-
-
-}
-
-
-
-
 #status-msg {
 
 
@@ -673,4 +660,91 @@ h1 {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+/* =========================
+   TELA DE SUCESSO
+========================= */
+
+.tela-sucesso {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.tela-sucesso-conteudo {
+    max-width: 420px;
+    width: 100%;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 36px 28px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    animation: entrada-sucesso .3s ease;
+}
+
+@keyframes entrada-sucesso {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.icone-sucesso {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--livre);
+    color: #0a2e0f;
+    font-size: 32px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+}
+
+.tela-sucesso h2 {
+    margin: 0 0 14px;
+    font-size: 20px;
+    color: #fff;
+}
+
+.tela-sucesso p {
+    margin: 0 0 14px;
+    color: #ccc;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+#sucessoDetalhes {
+    color: #eee;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.sucesso-obs {
+    font-size: 12px !important;
+    color: #9aa4b2 !important;
+    font-weight: 400 !important;
+}
+
+#btnVoltarHome {
+    margin-top: 8px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--selecionada);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#btnVoltarHome:hover {
+    filter: brightness(1.1);
 }
