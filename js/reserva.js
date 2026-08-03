@@ -73,7 +73,8 @@ async function executarReserva() {
         );
 
         if (resposta.ok) {
-            status.textContent = resposta.mensagem;
+            status.textContent = resposta.mensagem ||
+                "Reserva confirmada com sucesso! Guarde seu contato, ele será usado para localizar sua reserva.";
 
             reservaAtual = {
                 token: resposta.token,
@@ -88,11 +89,6 @@ async function executarReserva() {
             btn.style.display = "none";
             document.getElementById("nome").disabled = true;
             document.getElementById("contato").disabled = true;
-
-            const btnPagar = document.getElementById("btnPagar");
-            btnPagar.classList.remove("oculto");
-            btnPagar.disabled = false;
-            btnPagar.textContent = "Pagar agora (opcional)";
         } else {
             // 6. Quando uma tentativa de escrita falha por conflito
             status.textContent = "Erro: " + resposta.erro;
@@ -146,7 +142,6 @@ export async function cancelarReservaUsuario() {
 // =====================================================
 export function limparReserva() {
     reservaAtual = null;
-    document.getElementById("btnPagar").classList.add("oculto");
     document.getElementById("btnReservar").style.display = "block";
     document.getElementById("nome").disabled = false;
     document.getElementById("contato").disabled = false;

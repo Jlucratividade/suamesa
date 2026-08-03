@@ -5,7 +5,6 @@
 import { getMesas } from "./api.js";
 import { atualizarMesas, definirCoordenadas } from "./mapa.js";
 import { iniciarReserva } from "./reserva.js";
-import { iniciarPagamento } from "./pagamento.js";
 import { iniciarValidacao } from "./validacao.js";
 
 // =====================================================
@@ -204,43 +203,9 @@ function configurarBotaoAtualizar() {
 }
 
 // =====================================================
-// Verificar retorno do pagamento (Mercado Pago)
-// =====================================================
-function verificarRetornoPagamento() {
-    const params = new URLSearchParams(window.location.search);
-    const pagamento = params.get("pagamento");
-    
-    if (!pagamento) return;
-
-    const mesasParam = params.get("mesas") || "";
-    const mesas = mesasParam.split(",").filter(Boolean);
-    const listaMesas = mesas.length 
-        ? "Mesa" + (mesas.length > 1 ? "s " : " ") + mesas.join(", ") 
-        : "Suas mesas";
-
-    let mensagem = "";
-    
-    if (pagamento === "ok") {
-        mensagem = listaMesas + " compradas com sucesso! Em instantes a informação será atualizada no mapa.";
-    } else if (pagamento === "pendente") {
-        mensagem = listaMesas + ": pagamento pendente de confirmação. Assim que for aprovado, o mapa será atualizado automaticamente.";
-    } else {
-        mensagem = listaMesas + ": não foi possível confirmar o pagamento. Tente novamente ou entre em contato conosco.";
-    }
-
-    alert(mensagem);
-
-    // Limpa os parâmetros da URL para não repetir o alerta
-    const urlLimpa = window.location.origin + window.location.pathname;
-    window.history.replaceState({}, "", urlLimpa);
-}
-
-// =====================================================
 // Inicialização
 // =====================================================
 async function iniciarAplicacao() {
-    verificarRetornoPagamento();
-    
     // Carrega coordenadas
     await carregarCoordenadas();
     
@@ -256,7 +221,6 @@ async function iniciarAplicacao() {
     
     // Inicializa módulos
     iniciarReserva(carregarMesas);
-    iniciarPagamento();
     iniciarValidacao();
 }
 
