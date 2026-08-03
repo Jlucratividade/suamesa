@@ -17,6 +17,11 @@ export function iniciarReserva(callbackRefresh) {
 
     const btn = document.getElementById("btnReservar");
     btn.addEventListener("click", executarReserva);
+
+    const btnVoltar = document.getElementById("btnVoltarHome");
+    if (btnVoltar) {
+        btnVoltar.addEventListener("click", voltarParaHome);
+    }
 }
 
 // =====================================================
@@ -73,9 +78,6 @@ async function executarReserva() {
         );
 
         if (resposta.ok) {
-            status.textContent = resposta.mensagem ||
-                "Reserva confirmada com sucesso! Guarde seu contato, ele será usado para localizar sua reserva.";
-
             reservaAtual = {
                 token: resposta.token,
                 nome,
@@ -86,9 +88,11 @@ async function executarReserva() {
             // 4. Depois que uma ação de escrita é concluída (reservar)
             await refreshMapa();
 
-            btn.style.display = "none";
-            document.getElementById("nome").disabled = true;
-            document.getElementById("contato").disabled = true;
+            mostrarTelaSucesso(nome, mesasSelecionadasArray);
+
+            status.textContent = "";
+            btn.disabled = false;
+            btn.textContent = "Reservar";
         } else {
             // 6. Quando uma tentativa de escrita falha por conflito
             status.textContent = "Erro: " + resposta.erro;
@@ -105,6 +109,42 @@ async function executarReserva() {
         btn.disabled = false;
         btn.textContent = "Reservar";
     }
+}
+
+// =====================================================
+// Tela de sucesso da reserva
+// =====================================================
+function mostrarTelaSucesso(nome, mesasIds) {
+    const appHome = document.getElementById("appHome");
+    const telaSucesso = document.getElementById("telaSucesso");
+    const saudacao = document.getElementById("sucessoSaudacao");
+    const detalhes = document.getElementById("sucessoDetalhes");
+
+    const primeiroNome = nome.trim().split(/\s+/)[0];
+    const listaMesas = mesasIds.join(", ");
+    const plural = mesasIds.length > 1 ? "mesas" : "mesa";
+
+    saudacao.textContent = `Prontinho, ${primeiroNome}!`;
+    detalhes.textContent = `Sua reserva da${mesasIds.length > 1 ? "s" : ""} ${plural} ${listaMesas} foi confirmada com sucesso.`;
+
+    appHome.classList.add("oculto");
+    telaSucesso.classList.remove("oculto");
+}
+
+// =====================================================
+// Voltar da tela de sucesso para a home
+// =====================================================
+function voltarParaHome() {
+    const appHome = document.getElementById("appHome");
+    const telaSucesso = document.getElementById("telaSucesso");
+
+    telaSucesso.classList.add("oculto");
+    appHome.classList.remove("oculto");
+
+    limparReserva();
+
+    // Atualiza o mapa para refletir o estado mais recente ao voltar
+    refreshMapa();
 }
 
 // =====================================================
@@ -142,8 +182,19 @@ export async function cancelarReservaUsuario() {
 // =====================================================
 export function limparReserva() {
     reservaAtual = null;
-    document.getElementById("btnReservar").style.display = "block";
-    document.getElementById("nome").disabled = false;
-    document.getElementById("contato").disabled = false;
+
+    const nome = document.getElementById("nome");
+    const contato = document.getElementById("contato");
+    const btn = document.getElementById("btnReservar");
+
+    nome.value = "";
+    nome.disabled = false;
+
+    contato.value = "";
+    contato.disabled = false;
+
+    btn.style.display = "block";
+
+    selecionadas.clear();
     atualizarResumo();
 }
