@@ -661,3 +661,55 @@ h1 {
     gap: 10px;
     flex-wrap: wrap;
 }
+
+/* =========================
+   BANNER DE BOAS-VINDAS
+   (usuário voltando após reserva confirmada)
+========================= */
+
+.banner-boas-vindas {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: linear-gradient(135deg, rgba(47,111,237,.20), rgba(47,111,237,.06));
+    border: 1px solid rgba(47,111,237,.45);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.banner-boas-vindas strong {
+    color: #fff;
+}
+
+.banner-boas-vindas .fechar-banner {
+    background: transparent;
+    border: none;
+    color: #9aa4b2;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.banner-boas-vindas .fechar-banner:hover {
+    color: #fff;
+}
+
+/* =========================
+   MESA/MARCADOR EM DESTAQUE
+========================= */
+
+.mesa.destaque,
+.marcador-mesa.destaque {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, .9), 0 0 16px 4px rgba(47,111,237,.9);
+    animation: pulsar-destaque 1.4s ease-in-out infinite;
+    z-index: 6;
+}
+
+@keyframes pulsar-destaque {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+}

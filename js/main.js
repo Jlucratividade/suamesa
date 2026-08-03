@@ -3,9 +3,10 @@
 // =====================================================
 
 import { getMesas } from "./api.js";
-import { atualizarMesas, definirCoordenadas } from "./mapa.js";
+import { atualizarMesas, definirCoordenadas, definirMesasDestaque } from "./mapa.js";
 import { iniciarReserva } from "./reserva.js";
 import { iniciarValidacao } from "./validacao.js";
+import { obterReservaSucesso, limparReservaSucesso } from "./estadoReserva.js";
 
 // =====================================================
 // CONFIGURAÇÕES

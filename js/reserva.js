@@ -5,6 +5,7 @@
 import { validarFormulario } from "./validacao.js";
 import { reservarMesas, cancelarReserva } from "./api.js";
 import { selecionadas, atualizarResumo, mesasState } from "./mapa.js";
+import { salvarReservaSucesso, salvarReservaErro } from "./estadoReserva.js";
 
 export let reservaAtual = null;
 let refreshMapaCallback = null;
@@ -17,11 +18,6 @@ export function iniciarReserva(callbackRefresh) {
 
     const btn = document.getElementById("btnReservar");
     btn.addEventListener("click", executarReserva);
-
-    const btnVoltar = document.getElementById("btnVoltarHome");
-    if (btnVoltar) {
-        btnVoltar.addEventListener("click", voltarParaHome);
-    }
 }
 
 // =====================================================
@@ -62,9 +58,16 @@ async function executarReserva() {
 
     if (mesasIndisponiveis.length > 0) {
         const ids = mesasIndisponiveis.map(m => m.id).join(", ");
-        status.textContent = `Conflito: A(s) mesa(s) ${ids} já não está(ão) disponível(eis). Selecione outras.`;
-        btn.disabled = false;
-        btn.textContent = "Reservar";
+
+        // Guarda o motivo do erro e manda para a página de erro
+        salvarReservaErro({
+            mensagem: `A(s) mesa(s) ${ids} já não está(ão) disponível(eis). Selecione outras.`,
+            mesas: mesasSelecionadasArray,
+            nome,
+            contato
+        });
+
+        window.location.href = "erro.html";
         return;
     }
 
@@ -85,66 +88,50 @@ async function executarReserva() {
                 mesas: mesasSelecionadasArray
             };
 
+            // Guarda os dados da reserva confirmada para a página de sucesso
+            // (e para destacar a mesa/nome quando o usuário voltar à home)
+            salvarReservaSucesso({
+                nome,
+                contato,
+                mesas: mesasSelecionadasArray,
+                token: resposta.token,
+                // O backend pode não devolver um horário específico da
+                // reserva; usamos o momento em que a confirmação chegou
+                // ao navegador como "horário da reserva efetivada".
+                horario: resposta.horario || resposta.dataReserva || new Date().toISOString(),
+                mensagem: resposta.mensagem || null
+            });
+
             // 4. Depois que uma ação de escrita é concluída (reservar)
             await refreshMapa();
 
-            mostrarTelaSucesso(nome, mesasSelecionadasArray);
-
-            status.textContent = "";
-            btn.disabled = false;
-            btn.textContent = "Reservar";
+            window.location.href = "sucesso.html";
         } else {
             // 6. Quando uma tentativa de escrita falha por conflito
-            status.textContent = "Erro: " + resposta.erro;
+            salvarReservaErro({
+                mensagem: resposta.erro || "Não foi possível concluir sua reserva.",
+                mesas: mesasSelecionadasArray,
+                nome,
+                contato
+            });
+
             await refreshMapa(); // Atualiza para mostrar o estado real
-            
-            btn.disabled = false;
-            btn.textContent = "Reservar";
+
+            window.location.href = "erro.html";
         }
     } catch(erro) {
-        status.textContent = "Erro de comunicação: " + erro.message;
+        salvarReservaErro({
+            mensagem: "Erro de comunicação: " + erro.message,
+            mesas: mesasSelecionadasArray,
+            nome,
+            contato
+        });
+
         // 6. Também atualiza em caso de erro de rede/conflito
         await refreshMapa();
-        
-        btn.disabled = false;
-        btn.textContent = "Reservar";
+
+        window.location.href = "erro.html";
     }
-}
-
-// =====================================================
-// Tela de sucesso da reserva
-// =====================================================
-function mostrarTelaSucesso(nome, mesasIds) {
-    const appHome = document.getElementById("appHome");
-    const telaSucesso = document.getElementById("telaSucesso");
-    const saudacao = document.getElementById("sucessoSaudacao");
-    const detalhes = document.getElementById("sucessoDetalhes");
-
-    const primeiroNome = nome.trim().split(/\s+/)[0];
-    const listaMesas = mesasIds.join(", ");
-    const plural = mesasIds.length > 1 ? "mesas" : "mesa";
-
-    saudacao.textContent = `Prontinho, ${primeiroNome}!`;
-    detalhes.textContent = `Sua reserva da${mesasIds.length > 1 ? "s" : ""} ${plural} ${listaMesas} foi confirmada com sucesso.`;
-
-    appHome.classList.add("oculto");
-    telaSucesso.classList.remove("oculto");
-}
-
-// =====================================================
-// Voltar da tela de sucesso para a home
-// =====================================================
-function voltarParaHome() {
-    const appHome = document.getElementById("appHome");
-    const telaSucesso = document.getElementById("telaSucesso");
-
-    telaSucesso.classList.add("oculto");
-    appHome.classList.remove("oculto");
-
-    limparReserva();
-
-    // Atualiza o mapa para refletir o estado mais recente ao voltar
-    refreshMapa();
 }
 
 // =====================================================
@@ -182,19 +169,8 @@ export async function cancelarReservaUsuario() {
 // =====================================================
 export function limparReserva() {
     reservaAtual = null;
-
-    const nome = document.getElementById("nome");
-    const contato = document.getElementById("contato");
-    const btn = document.getElementById("btnReservar");
-
-    nome.value = "";
-    nome.disabled = false;
-
-    contato.value = "";
-    contato.disabled = false;
-
-    btn.style.display = "block";
-
-    selecionadas.clear();
+    document.getElementById("btnReservar").style.display = "block";
+    document.getElementById("nome").disabled = false;
+    document.getElementById("contato").disabled = false;
     atualizarResumo();
 }
