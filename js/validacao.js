@@ -61,7 +61,7 @@ export function verificarHabilitacaoBotao(mesasSelecionadasCount) {
     if (temMesas && nomeValido && contatoValido) {
 
         btnReservar.disabled = false;
-        btnReservar.textContent = "Reservar mesa(s)";
+        btnReservar.textContent = "Reservar e ir para pagamento";
 
     } else if (!temMesas) {
 

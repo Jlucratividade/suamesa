@@ -11,18 +11,6 @@ export let selecionadas = new Set();
 
 export let mesaCoordenadas = {};
 
-// Mesas que devem aparecer "em destaque" (ex.: mesa da última reserva
-// confirmada, quando o usuário volta para a home)
-export let mesasDestaque = new Set();
-
-export function definirMesasDestaque(ids) {
-    mesasDestaque = new Set((ids || []).map(String));
-}
-
-export function limparMesasDestaque() {
-    mesasDestaque = new Set();
-}
-
 
 
 
@@ -153,15 +141,8 @@ export function renderMapa(mesas) {
 
 
 
-            // MÉTODO DE PAGAMENTO DESATIVADO NESTA VERSÃO (apenas reserva):
-            // o valor da mesa (preço) está atrelado ao pagamento, então
-            // deixamos de exibi-lo para o cliente. Código original mantido
-            // comentado para reativação futura, se o pagamento voltar a
-            // fazer parte do fluxo.
-            // el.title =
-            //     `Mesa ${mesa.id} · ${mesa.capacidade} lugares · R$ ${Number(mesa.preco).toFixed(2)}`;
             el.title =
-                `Mesa ${mesa.id} · ${mesa.capacidade} lugares`;
+                `Mesa ${mesa.id} · ${mesa.capacidade} lugares · R$ ${Number(mesa.preco).toFixed(2)}`;
 
 
 
@@ -299,12 +280,8 @@ export function renderMarcadoresImagem(mesas) {
 
 
 
-        // MÉTODO DE PAGAMENTO DESATIVADO NESTA VERSÃO (apenas reserva):
-        // idem ao tooltip da grade — preço comentado, código preservado.
-        // marcador.title =
-        //     `Mesa ${mesa.id} · ${mesa.capacidade} lugares · R$ ${Number(mesa.preco).toFixed(2)}`;
         marcador.title =
-            `Mesa ${mesa.id} · ${mesa.capacidade} lugares`;
+            `Mesa ${mesa.id} · ${mesa.capacidade} lugares · R$ ${Number(mesa.preco).toFixed(2)}`;
 
 
 
@@ -371,13 +348,8 @@ function aplicarStatus(
     elemento.classList.remove(
         "reservada",
         "paga",
-        "selecionada",
-        "destaque"
+        "selecionada"
     );
-
-    if (mesasDestaque.has(String(mesa.id))) {
-        elemento.classList.add("destaque");
-    }
 
 
 
@@ -494,28 +466,21 @@ export function atualizarResumo() {
         Array.from(selecionadas)
             .join(", ");
 
-    // MÉTODO DE PAGAMENTO DESATIVADO NESTA VERSÃO (apenas reserva):
-    // o cálculo do valor total é parte do fluxo de pagamento, que não
-    // existe mais aqui. Código original comentado para reativação futura.
-    //
-    // const total =
-    //     mesasState
-    //         .filter(m =>
-    //             selecionadas.has(
-    //                 String(m.id)
-    //             )
-    //         )
-    //         .reduce(
-    //             (soma, m) =>
-    //                 soma + Number(m.preco),
-    //             0
-    //         );
-    //
-    // resumo.textContent =
-    //     `Mesas: ${lista} · Total: R$ ${total.toFixed(2)}`;
+    const total =
+        mesasState
+            .filter(m =>
+                selecionadas.has(
+                    String(m.id)
+                )
+            )
+            .reduce(
+                (soma, m) =>
+                    soma + Number(m.preco),
+                0
+            );
 
     resumo.textContent =
-        `Mesas selecionadas: ${lista}`;
+        `Mesas: ${lista} · Total: R$ ${total.toFixed(2)}`;
 
     // CORREÇÃO: Em vez de forçar disabled = false, 
     // delegamos a decisão para a função que valida nome e contato também

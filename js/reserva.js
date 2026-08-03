@@ -5,7 +5,6 @@
 import { validarFormulario } from "./validacao.js";
 import { reservarMesas, cancelarReserva } from "./api.js";
 import { selecionadas, atualizarResumo, mesasState } from "./mapa.js";
-import { salvarReservaSucesso, salvarReservaErro } from "./estadoReserva.js";
 
 export let reservaAtual = null;
 let refreshMapaCallback = null;
@@ -58,16 +57,9 @@ async function executarReserva() {
 
     if (mesasIndisponiveis.length > 0) {
         const ids = mesasIndisponiveis.map(m => m.id).join(", ");
-
-        // Guarda o motivo do erro e manda para a página de erro
-        salvarReservaErro({
-            mensagem: `A(s) mesa(s) ${ids} já não está(ão) disponível(eis). Selecione outras.`,
-            mesas: mesasSelecionadasArray,
-            nome,
-            contato
-        });
-
-        window.location.href = "erro.html";
+        status.textContent = `Conflito: A(s) mesa(s) ${ids} já não está(ão) disponível(eis). Selecione outras.`;
+        btn.disabled = false;
+        btn.textContent = "Reservar";
         return;
     }
 
@@ -81,6 +73,8 @@ async function executarReserva() {
         );
 
         if (resposta.ok) {
+            status.textContent = resposta.mensagem;
+
             reservaAtual = {
                 token: resposta.token,
                 nome,
@@ -88,49 +82,32 @@ async function executarReserva() {
                 mesas: mesasSelecionadasArray
             };
 
-            // Guarda os dados da reserva confirmada para a página de sucesso
-            // (e para destacar a mesa/nome quando o usuário voltar à home)
-            salvarReservaSucesso({
-                nome,
-                contato,
-                mesas: mesasSelecionadasArray,
-                token: resposta.token,
-                // O backend pode não devolver um horário específico da
-                // reserva; usamos o momento em que a confirmação chegou
-                // ao navegador como "horário da reserva efetivada".
-                horario: resposta.horario || resposta.dataReserva || new Date().toISOString(),
-                mensagem: resposta.mensagem || null
-            });
-
             // 4. Depois que uma ação de escrita é concluída (reservar)
             await refreshMapa();
 
-            window.location.href = "sucesso.html";
+            btn.style.display = "none";
+            document.getElementById("nome").disabled = true;
+            document.getElementById("contato").disabled = true;
+
+            const btnPagar = document.getElementById("btnPagar");
+            btnPagar.classList.remove("oculto");
+            btnPagar.disabled = false;
+            btnPagar.textContent = "Pagar agora (opcional)";
         } else {
             // 6. Quando uma tentativa de escrita falha por conflito
-            salvarReservaErro({
-                mensagem: resposta.erro || "Não foi possível concluir sua reserva.",
-                mesas: mesasSelecionadasArray,
-                nome,
-                contato
-            });
-
+            status.textContent = "Erro: " + resposta.erro;
             await refreshMapa(); // Atualiza para mostrar o estado real
-
-            window.location.href = "erro.html";
+            
+            btn.disabled = false;
+            btn.textContent = "Reservar";
         }
     } catch(erro) {
-        salvarReservaErro({
-            mensagem: "Erro de comunicação: " + erro.message,
-            mesas: mesasSelecionadasArray,
-            nome,
-            contato
-        });
-
+        status.textContent = "Erro de comunicação: " + erro.message;
         // 6. Também atualiza em caso de erro de rede/conflito
         await refreshMapa();
-
-        window.location.href = "erro.html";
+        
+        btn.disabled = false;
+        btn.textContent = "Reservar";
     }
 }
 
@@ -169,6 +146,7 @@ export async function cancelarReservaUsuario() {
 // =====================================================
 export function limparReserva() {
     reservaAtual = null;
+    document.getElementById("btnPagar").classList.add("oculto");
     document.getElementById("btnReservar").style.display = "block";
     document.getElementById("nome").disabled = false;
     document.getElementById("contato").disabled = false;
